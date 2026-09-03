@@ -1,5 +1,7 @@
 import customtkinter as ctk
 
+from ui.login import LoginFrame
+
 
 class EmployeeManagementApp(ctk.CTk):
     def __init__(self):
@@ -9,12 +11,25 @@ class EmployeeManagementApp(ctk.CTk):
         self.geometry("900x600")
         self.minsize(800, 500)
 
-        self.main_label = ctk.CTkLabel(
+        self.show_login()
+
+    def show_login(self):
+        self.login_frame = LoginFrame(
             self,
-            text="Employee Management System",
-            font=ctk.CTkFont(size=28, weight="bold"),
+            on_login_success=self.handle_login_success,
         )
-        self.main_label.pack(expand=True)
+        self.login_frame.pack(
+            expand=True,
+            fill="both",
+            padx=20,
+            pady=20,
+        )
+
+    def handle_login_success(self, user):
+        print(
+            f"Login successful: "
+            f"{user['username']} ({user['role']})"
+        )
 
 
 def main():

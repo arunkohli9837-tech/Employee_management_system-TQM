@@ -222,15 +222,37 @@ Establish the initial Role-Based Access Control (RBAC) foundation for controllin
 - Employee
 
 **Work completed:**
-- Added a centralized role-permission mapping.
+- Added centralized role-permission mapping.
 - Added permission checking functionality.
 - Added role checking functionality.
-- Added support for checking whether a user belongs to any of a set of allowed roles.
-- Connected RBAC checks with the role information maintained by the current-user session.
+- Added support for checking multiple allowed roles.
+- Connected RBAC checks with the current-user session role.
 
 **Testing:**
-- Existing Admin account is used for RBAC testing.
-- Admin role and Admin permissions are verified.
-- HR and Employee login testing is not performed at this stage because those accounts have not yet been created.
+- Admin role was tested successfully.
+- Admin permissions were verified successfully.
+- HR and Employee accounts were created for authentication testing.
+- HR and Employee login were tested successfully.
 
-**Status:** In progress.
+**Status:** Completed.
+## Commit 16 — Create employee database functionality
+
+**Objective:**  
+Create the database service foundation for accessing employee records.
+
+**Work completed:**
+- Added `services/employee_service.py`.
+- Added employee database-row to dictionary conversion.
+- Added employee lookup by database ID.
+- Used the existing SQLite database connection layer.
+- Ensured database connections are closed after the operation.
+
+**Testing:**
+- Application startup was tested successfully.
+- Admin login was tested successfully.
+- HR login was tested successfully.
+- Employee login was tested successfully.
+- Employee lookup with a non-existing ID was tested and correctly returned `None`.
+- No unexpected error occurred during testing.
+
+**Status:** Completed.

@@ -1,7 +1,7 @@
 import customtkinter as ctk
 
 from ui.login import LoginFrame
-
+from services.session import Session
 
 class EmployeeManagementApp(ctk.CTk):
     def __init__(self):
@@ -10,6 +10,7 @@ class EmployeeManagementApp(ctk.CTk):
         self.title("Employee Management System")
         self.geometry("900x600")
         self.minsize(800, 500)
+        self.session = Session()
 
         self.show_login()
 
@@ -26,9 +27,14 @@ class EmployeeManagementApp(ctk.CTk):
         )
 
     def handle_login_success(self, user):
+        self.session.login(user)
+
+        current_user = self.session.get_current_user()
+
         print(
             f"Login successful: "
-            f"{user['username']} ({user['role']})"
+            f"{current_user['username']} "
+            f"({current_user['role']})"
         )
 
 

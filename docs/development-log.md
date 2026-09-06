@@ -279,3 +279,23 @@ Implement reliable employee record creation through the employee service layer.
 - No unexpected error occurred during testing.
 
 **Status:** Completed.
+## Commit 18 — Implement employee listing service
+
+**Objective:**  
+Implement reliable retrieval of all employee records from the database.
+
+**Work completed:**
+- Added `get_all_employees()` to the employee service.
+- Retrieved all employee fields from the `employees` table.
+- Reused the existing employee row-to-dictionary conversion.
+- Ordered employee records by database ID.
+- Ensured database connections are closed after retrieval.
+
+**Testing:**
+- Existing employee records were retrieved successfully.
+- Employee records were returned as dictionaries.
+- Employee count was verified successfully.
+- Application startup and login flow remained functional.
+- No unexpected error occurred during testing.
+
+**Status:** Completed.

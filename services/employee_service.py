@@ -134,4 +134,35 @@ def create_employee(
         raise
 
     finally:
-        connection.close()    
+        connection.close() 
+
+def get_all_employees():
+    """Return all employee records ordered by database ID."""
+
+    connection = get_connection()
+
+    try:
+        rows = connection.execute(
+            """
+            SELECT
+                id,
+                employee_code,
+                full_name,
+                email,
+                phone,
+                department,
+                designation,
+                salary,
+                joining_date,
+                status,
+                created_at,
+                updated_at
+            FROM employees
+            ORDER BY id
+            """
+        ).fetchall()
+
+        return [_employee_row_to_dict(row) for row in rows]
+
+    finally:
+        connection.close()   

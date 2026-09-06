@@ -52,3 +52,86 @@ def get_employee_by_id(employee_id: int):
 
     finally:
         connection.close()
+
+def create_employee(
+    employee_code: str,
+    full_name: str,
+    email: str,
+    phone: str,
+    department: str,
+    designation: str,
+    salary: float,
+    joining_date: str,
+):
+    """Create a new employee record and return its database ID."""
+
+    employee_code = employee_code.strip()
+    full_name = full_name.strip()
+    email = email.strip()
+    phone = phone.strip()
+    department = department.strip()
+    designation = designation.strip()
+    joining_date = joining_date.strip()
+
+    if not employee_code:
+        raise ValueError("Employee code must not be empty.")
+
+    if not full_name:
+        raise ValueError("Full name must not be empty.")
+
+    if not email:
+        raise ValueError("Email must not be empty.")
+
+    if not phone:
+        raise ValueError("Phone must not be empty.")
+
+    if not department:
+        raise ValueError("Department must not be empty.")
+
+    if not designation:
+        raise ValueError("Designation must not be empty.")
+
+    if not joining_date:
+        raise ValueError("Joining date must not be empty.")
+
+    if salary < 0:
+        raise ValueError("Salary must not be negative.")
+
+    connection = get_connection()
+
+    try:
+        cursor = connection.execute(
+            """
+            INSERT INTO employees (
+                employee_code,
+                full_name,
+                email,
+                phone,
+                department,
+                designation,
+                salary,
+                joining_date
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                employee_code,
+                full_name,
+                email,
+                phone,
+                department,
+                designation,
+                salary,
+                joining_date,
+            ),
+        )
+
+        connection.commit()
+        return cursor.lastrowid
+
+    except Exception:
+        connection.rollback()
+        raise
+
+    finally:
+        connection.close()    

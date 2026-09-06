@@ -1,0 +1,128 @@
+[1mdiff --git a/docs/development-log.md b/docs/development-log.md[m
+[1mindex ca374ab..1e1385e 100644[m
+[1m--- a/docs/development-log.md[m
+[1m+++ b/docs/development-log.md[m
+[36m@@ -255,4 +255,27 @@[m [mCreate the database service foundation for accessing employee records.[m
+ - Employee lookup with a non-existing ID was tested and correctly returned `None`.[m
+ - No unexpected error occurred during testing.[m
+ [m
+[32m+[m[32m**Status:** Completed.[m
+[32m+[m[32m## Commit 17 — Implement employee creation service[m
+[32m+[m
+[32m+[m[32m**Objective:**[m[41m  [m
+[32m+[m[32mImplement reliable employee record creation through the employee service layer.[m
+[32m+[m
+[32m+[m[32m**Work completed:**[m
+[32m+[m[32m- Added `create_employee()` to the employee service.[m
+[32m+[m[32m- Added required-field validation.[m
+[32m+[m[32m- Added negative salary validation.[m
+[32m+[m[32m- Added database insertion using parameterized SQL.[m
+[32m+[m[32m- Added transaction commit on successful insertion.[m
+[32m+[m[32m- Added transaction rollback on insertion failure.[m
+[32m+[m[32m- Ensured database connections are closed properly.[m
+[32m+[m[32m- Returned the newly created employee database ID.[m
+[32m+[m
+[32m+[m[32m**Testing:**[m
+[32m+[m[32m- New employee record was created successfully.[m
+[32m+[m[32m- Created employee was retrieved successfully using its database ID.[m
+[32m+[m[32m- Duplicate employee code was correctly rejected by the database unique constraint.[m
+[32m+[m[32m- Application startup and login flow remained functional.[m
+[32m+[m[32m- No unexpected error occurred during testing.[m
+[32m+[m
+ **Status:** Completed.[m
+\ No newline at end of file[m
+[1mdiff --git a/services/employee_service.py b/services/employee_service.py[m
+[1mindex 68b333c..22f791c 100644[m
+[1m--- a/services/employee_service.py[m
+[1m+++ b/services/employee_service.py[m
+[36m@@ -51,4 +51,87 @@[m [mdef get_employee_by_id(employee_id: int):[m
+         return _employee_row_to_dict(row)[m
+ [m
+     finally:[m
+[31m-        connection.close()[m
+\ No newline at end of file[m
+[32m+[m[32m        connection.close()[m
+[32m+[m
+[32m+[m[32mdef create_employee([m
+[32m+[m[32m    employee_code: str,[m
+[32m+[m[32m    full_name: str,[m
+[32m+[m[32m    email: str,[m
+[32m+[m[32m    phone: str,[m
+[32m+[m[32m    department: str,[m
+[32m+[m[32m    designation: str,[m
+[32m+[m[32m    salary: float,[m
+[32m+[m[32m    joining_date: str,[m
+[32m+[m[32m):[m
+[32m+[m[32m    """Create a new employee record and return its database ID."""[m
+[32m+[m
+[32m+[m[32m    employee_code = employee_code.strip()[m
+[32m+[m[32m    full_name = full_name.strip()[m
+[32m+[m[32m    email = email.strip()[m
+[32m+[m[32m    phone = phone.strip()[m
+[32m+[m[32m    department = department.strip()[m
+[32m+[m[32m    designation = designation.strip()[m
+[32m+[m[32m    joining_date = joining_date.strip()[m
+[32m+[m
+[32m+[m[32m    if not employee_code:[m
+[32m+[m[32m        raise ValueError("Employee code must not be empty.")[m
+[32m+[m
+[32m+[m[32m    if not full_name:[m
+[32m+[m[32m        raise ValueError("Full name must not be empty.")[m
+[32m+[m
+[32m+[m[32m    if not email:[m
+[32m+[m[32m        raise ValueError("Email must not be empty.")[m
+[32m+[m
+[32m+[m[32m    if not phone:[m
+[32m+[m[32m        raise ValueError("Phone must not be empty.")[m
+[32m+[m
+[32m+[m[32m    if not department:[m
+[32m+[m[32m        raise ValueError("Department must not be empty.")[m
+[32m+[m
+[32m+[m[32m    if not designation:[m
+[32m+[m[32m        raise ValueError("Designation must not be empty.")[m
+[32m+[m
+[32m+[m[32m    if not joining_date:[m
+[32m+[m[32m        raise ValueError("Joining date must not be empty.")[m
+[32m+[m
+[32m+[m[32m    if salary < 0:[m
+[32m+[m[32m        raise ValueError("Salary must not be negative.")[m
+[32m+[m
+[32m+[m[32m    connection = get_connection()[m
+[32m+[m
+[32m+[m[32m    try:[m
+[32m+[m[32m        cursor = connection.execute([m
+[32m+[m[32m            """[m
+[32m+[m[32m            INSERT INTO employees ([m
+[32m+[m[32m                employee_code,[m
+[32m+[m[32m                full_name,[m
+[32m+[m[32m                email,[m
+[32m+[m[32m                phone,[m
+[32m+[m[32m                department,[m
+[32m+[m[32m                designation,[m
+[32m+[m[32m                salary,[m
+[32m+[m[32m                joining_date[m
+[32m+[m[32m            )[m
+[32m+[m[32m            VALUES (?, ?, ?, ?, ?, ?, ?, ?)[m
+[32m+[m[32m            """,[m
+[32m+[m[32m            ([m
+[32m+[m[32m                employee_code,[m
+[32m+[m[32m                full_name,[m
+[32m+[m[32m                email,[m
+[32m+[m[32m                phone,[m
+[32m+[m[32m                department,[m
+[32m+[m[32m                designation,[m
+[32m+[m[32m                salary,[m
+[32m+[m[32m                joining_date,[m
+[32m+[m[32m            ),[m
+[32m+[m[32m        )[m
+[32m+[m
+[32m+[m[32m        connection.commit()[m
+[32m+[m[32m        return cursor.lastrowid[m
+[32m+[m
+[32m+[m[32m    except Exception:[m
+[32m+[m[32m        connection.rollback()[m
+[32m+[m[32m        raise[m
+[32m+[m
+[32m+[m[32m    finally:[m
+[32m+[m[32m        connection.close()[m[41m    [m
+\ No newline at end of file[m

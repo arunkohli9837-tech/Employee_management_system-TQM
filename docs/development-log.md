@@ -256,3 +256,26 @@ Create the database service foundation for accessing employee records.
 - No unexpected error occurred during testing.
 
 **Status:** Completed.
+## Commit 17 — Implement employee creation service
+
+**Objective:**  
+Implement reliable employee record creation through the employee service layer.
+
+**Work completed:**
+- Added `create_employee()` to the employee service.
+- Added required-field validation.
+- Added negative salary validation.
+- Added database insertion using parameterized SQL.
+- Added transaction commit on successful insertion.
+- Added transaction rollback on insertion failure.
+- Ensured database connections are closed properly.
+- Returned the newly created employee database ID.
+
+**Testing:**
+- New employee record was created successfully.
+- Created employee was retrieved successfully using its database ID.
+- Duplicate employee code was correctly rejected by the database unique constraint.
+- Application startup and login flow remained functional.
+- No unexpected error occurred during testing.
+
+**Status:** Completed.

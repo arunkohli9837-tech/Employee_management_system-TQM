@@ -166,3 +166,46 @@ def get_all_employees():
 
     finally:
         connection.close()   
+
+def search_employees(search_term: str):
+    """Search employees by code, name, email, or department."""
+
+    search_term = search_term.strip()
+
+    if not search_term:
+        return []
+
+    connection = get_connection()
+
+    try:
+        pattern = f"%{search_term}%"
+
+        rows = connection.execute(
+            """
+            SELECT
+                id,
+                employee_code,
+                full_name,
+                email,
+                phone,
+                department,
+                designation,
+                salary,
+                joining_date,
+                status,
+                created_at,
+                updated_at
+            FROM employees
+            WHERE employee_code LIKE ?
+               OR full_name LIKE ?
+               OR email LIKE ?
+               OR department LIKE ?
+            ORDER BY id
+            """,
+            (pattern, pattern, pattern, pattern),
+        ).fetchall()
+
+        return [_employee_row_to_dict(row) for row in rows]
+
+    finally:
+        connection.close()

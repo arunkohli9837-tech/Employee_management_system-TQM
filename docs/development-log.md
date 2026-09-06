@@ -299,3 +299,30 @@ Implement reliable retrieval of all employee records from the database.
 - No unexpected error occurred during testing.
 
 **Status:** Completed.
+## Commit 19 — Implement employee search service
+
+**Objective:**  
+Implement reliable employee search functionality using common employee fields.
+
+**Work completed:**
+- Added `search_employees()` to the employee service.
+- Added search by employee code.
+- Added search by full name.
+- Added search by email.
+- Added search by department.
+- Added partial text matching.
+- Added handling for empty search terms.
+- Used parameterized SQL queries.
+- Ensured database connections are closed after searching.
+
+**Testing:**
+- Employee code search was tested successfully.
+- Employee name search was tested successfully.
+- Department search was tested successfully.
+- Partial search was tested successfully.
+- No-match search correctly returned an empty list.
+- Empty search correctly returned an empty list.
+- Application startup and login flow remained functional.
+- No unexpected error occurred during testing.
+
+**Status:** Completed.

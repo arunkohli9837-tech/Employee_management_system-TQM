@@ -209,3 +209,93 @@ def search_employees(search_term: str):
 
     finally:
         connection.close()
+
+def update_employee(
+    employee_id: int,
+    employee_code: str,
+    full_name: str,
+    email: str,
+    phone: str,
+    department: str,
+    designation: str,
+    salary: float,
+    joining_date: str,
+):
+    """Update an existing employee record."""
+
+    employee_code = employee_code.strip()
+    full_name = full_name.strip()
+    email = email.strip()
+    phone = phone.strip()
+    department = department.strip()
+    designation = designation.strip()
+    joining_date = joining_date.strip()
+
+    if not employee_code:
+        raise ValueError("Employee code must not be empty.")
+
+    if not full_name:
+        raise ValueError("Full name must not be empty.")
+
+    if not email:
+        raise ValueError("Email must not be empty.")
+
+    if not phone:
+        raise ValueError("Phone must not be empty.")
+
+    if not department:
+        raise ValueError("Department must not be empty.")
+
+    if not designation:
+        raise ValueError("Designation must not be empty.")
+
+    if not joining_date:
+        raise ValueError("Joining date must not be empty.")
+
+    if salary < 0:
+        raise ValueError("Salary must not be negative.")
+
+    connection = get_connection()
+
+    try:
+        cursor = connection.execute(
+            """
+            UPDATE employees
+            SET
+                employee_code = ?,
+                full_name = ?,
+                email = ?,
+                phone = ?,
+                department = ?,
+                designation = ?,
+                salary = ?,
+                joining_date = ?,
+                updated_at = CURRENT_TIMESTAMP
+            WHERE id = ?
+            """,
+            (
+                employee_code,
+                full_name,
+                email,
+                phone,
+                department,
+                designation,
+                salary,
+                joining_date,
+                employee_id,
+            ),
+        )
+
+        if cursor.rowcount == 0:
+            connection.rollback()
+            return False
+
+        connection.commit()
+        return True
+
+    except Exception:
+        connection.rollback()
+        raise
+
+    finally:
+        connection.close()

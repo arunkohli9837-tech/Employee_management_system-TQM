@@ -326,3 +326,29 @@ Implement reliable employee search functionality using common employee fields.
 - No unexpected error occurred during testing.
 
 **Status:** Completed.
+## Commit 20 — Implement employee update service
+
+**Objective:**  
+Implement reliable updating of existing employee records.
+
+**Work completed:**
+- Added `update_employee()` to the employee service.
+- Added required-field validation.
+- Added negative salary validation.
+- Updated employee details using the employee database ID.
+- Preserved the existing employee ID and creation timestamp.
+- Updated `updated_at` when employee details are changed.
+- Used parameterized SQL queries.
+- Added transaction commit and rollback handling.
+- Ensured database connections are closed properly.
+- Returned `False` when the specified employee does not exist.
+
+**Testing:**
+- Existing employee record was updated successfully.
+- Updated employee details were verified successfully.
+- Non-existing employee ID correctly returned `False`.
+- Negative salary was correctly rejected by validation.
+- Application startup and login flow remained functional.
+- No unexpected error occurred during testing.
+
+**Status:** Completed.

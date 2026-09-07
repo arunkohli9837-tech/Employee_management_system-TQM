@@ -376,3 +376,28 @@ Implement safe employee deactivation using a soft-delete approach.
 - No unexpected error occurred during testing.
 
 **Status:** Completed.
+## Commit 22 — Implement user management service foundation
+
+**Objective:**  
+Create the initial user management service for safely retrieving user records without exposing password hashes.
+
+**Work completed:**
+- Created `services/user_service.py`.
+- Added user retrieval by database ID.
+- Added retrieval of all users.
+- Added user row-to-dictionary conversion.
+- Excluded password hashes from returned user data.
+- Ordered users by database ID.
+- Ensured database connections are closed after retrieval.
+
+**Testing:**
+- All existing users were retrieved successfully.
+- User count was verified successfully.
+- Existing user lookup by ID was successful.
+- Non-existing user lookup correctly returned `None`.
+- Password hashes were not exposed by the service.
+- Application startup and login flow remained functional.
+- Employee role access restrictions remained functional.
+- No unexpected error occurred during testing.
+
+**Status:** Completed.

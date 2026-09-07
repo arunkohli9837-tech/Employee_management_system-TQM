@@ -352,3 +352,27 @@ Implement reliable updating of existing employee records.
 - No unexpected error occurred during testing.
 
 **Status:** Completed.
+## Commit 21 — Implement employee deactivation
+
+**Objective:**  
+Implement safe employee deactivation using a soft-delete approach.
+
+**Work completed:**
+- Added `deactivate_employee()` to the employee service.
+- Changed employee status from `Active` to `Inactive`.
+- Preserved the employee record instead of permanently deleting it.
+- Updated `updated_at` during deactivation.
+- Added transaction commit and rollback handling.
+- Ensured database connections are closed properly.
+- Returned `False` when the employee does not exist or is already inactive.
+
+**Testing:**
+- Existing employee was successfully deactivated.
+- Employee record remained available in the database after deactivation.
+- Employee status was verified as `Inactive`.
+- Already inactive employee correctly returned `False`.
+- Non-existing employee ID correctly returned `False`.
+- Application startup and login flow remained functional.
+- No unexpected error occurred during testing.
+
+**Status:** Completed.

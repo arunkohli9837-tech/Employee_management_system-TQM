@@ -299,3 +299,35 @@ def update_employee(
 
     finally:
         connection.close()
+
+def deactivate_employee(employee_id: int):
+    """Deactivate an employee without permanently deleting the record."""
+
+    connection = get_connection()
+
+    try:
+        cursor = connection.execute(
+            """
+            UPDATE employees
+            SET
+                status = 'Inactive',
+                updated_at = CURRENT_TIMESTAMP
+            WHERE id = ?
+              AND status = 'Active'
+            """,
+            (employee_id,),
+        )
+
+        if cursor.rowcount == 0:
+            connection.rollback()
+            return False
+
+        connection.commit()
+        return True
+
+    except Exception:
+        connection.rollback()
+        raise
+
+    finally:
+        connection.close()

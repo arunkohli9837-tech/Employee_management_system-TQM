@@ -2,6 +2,7 @@ import sqlite3
 
 from database.database import get_connection
 from services.password_service import hash_password, verify_password
+from services.audit_service import create_audit_log
 
 
 ALLOWED_ROLES = {"Admin", "HR", "Employee"}
@@ -94,11 +95,23 @@ def authenticate_user(username: str, password: str):
         if not verify_password(password, stored_hash):
             return None
 
-        return {
+        user = {
             "id": user_id,
             "username": stored_username,
             "role": role,
         }
+
+        create_audit_log(
+            user_id=user_id,
+            username=stored_username,
+            action="LOGIN",
+            target_type="User",
+            target_id=user_id,
+            description="User logged in successfully",
+            status="Success",
+        )
+
+        return user
 
     finally:
         connection.close()

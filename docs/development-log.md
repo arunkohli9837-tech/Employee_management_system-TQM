@@ -426,3 +426,57 @@ Implement safe activation and deactivation of user accounts.
 - No unexpected error occurred during testing.
 
 **Status:** Completed.
+## Commit 24 — Strengthen role restrictions and RBAC
+
+**Objective:**  
+Strengthen role-based access control by adding explicit permission enforcement for protected operations.
+
+**Work completed:**
+- Enhanced `services/access_control.py`.
+- Added `require_permission()` for enforcing permission checks.
+- Kept role-based permission mappings for Admin, HR, and Employee.
+- Added safe handling for missing users and invalid roles.
+- `require_permission()` raises `PermissionError` when a user does not have the required permission.
+
+**Testing:**
+- Admin was allowed to manage users.
+- Admin was allowed to manage employees.
+- HR was denied user-management permission.
+- HR was allowed to manage employees.
+- Employee was denied user-management permission.
+- Employee was allowed to view employees.
+- `require_permission()` successfully allowed authorized operations.
+- Unauthorized Employee access to `manage_users` correctly raised `PermissionError`.
+- `services/access_control.py` compiled successfully.
+- `main.py` compiled successfully.
+- No unexpected project error occurred during testing.
+
+**Status:** Completed.
+## Commit 25 — Implement audit logging foundation
+
+**Objective:**  
+Implement a reusable audit logging service and record successful user login activity.
+
+**Work completed:**
+- Added `services/audit_service.py`.
+- Implemented `create_audit_log()` for storing system activity.
+- Added transaction commit and rollback handling.
+- Ensured database connections are closed properly.
+- Integrated successful login auditing into `authenticate_user()`.
+- Recorded user ID, username, action, target type, target ID, description, and status.
+
+**Testing:**
+- Audit logging service compiled successfully.
+- Direct audit-log insertion was verified in the database.
+- Application login using the `employee_test` account completed successfully.
+- A real `LOGIN` audit record was created and verified in the database.
+- Verified audit record:
+  - User ID: `3`
+  - Username: `employee_test`
+  - Action: `LOGIN`
+  - Target Type: `User`
+  - Target ID: `3`
+  - Status: `Success`
+- No unexpected error occurred during testing.
+
+**Status:** Completed.

@@ -401,3 +401,28 @@ Create the initial user management service for safely retrieving user records wi
 - No unexpected error occurred during testing.
 
 **Status:** Completed.
+## Commit 23 — Implement user activation and deactivation
+
+**Objective:**  
+Implement safe activation and deactivation of user accounts.
+
+**Work completed:**
+- Added `deactivate_user()` to the user service.
+- Added `activate_user()` to the user service.
+- Changed user account status without deleting user records.
+- Added transaction commit and rollback handling.
+- Ensured database connections are closed properly.
+- Returned `False` when the requested status change was not applicable.
+
+**Testing:**
+- Employee test account was successfully deactivated.
+- Inactive status was verified in the database.
+- Already inactive account correctly returned `False`.
+- Employee test account was successfully reactivated.
+- Active status was verified after reactivation.
+- Already active account correctly returned `False`.
+- Non-existing user correctly returned `False`.
+- Employee login worked successfully after reactivation.
+- No unexpected error occurred during testing.
+
+**Status:** Completed.

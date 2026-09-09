@@ -60,3 +60,64 @@ def get_all_users():
 
     finally:
         connection.close()
+
+def deactivate_user(user_id: int):
+    """Deactivate an active user account."""
+
+    connection = get_connection()
+
+    try:
+        cursor = connection.execute(
+            """
+            UPDATE users
+            SET is_active = 0
+            WHERE id = ?
+              AND is_active = 1
+            """,
+            (user_id,),
+        )
+
+        if cursor.rowcount == 0:
+            connection.rollback()
+            return False
+
+        connection.commit()
+        return True
+
+    except Exception:
+        connection.rollback()
+        raise
+
+    finally:
+        connection.close()
+
+
+def activate_user(user_id: int):
+    """Activate an inactive user account."""
+
+    connection = get_connection()
+
+    try:
+        cursor = connection.execute(
+            """
+            UPDATE users
+            SET is_active = 1
+            WHERE id = ?
+              AND is_active = 0
+            """,
+            (user_id,),
+        )
+
+        if cursor.rowcount == 0:
+            connection.rollback()
+            return False
+
+        connection.commit()
+        return True
+
+    except Exception:
+        connection.rollback()
+        raise
+
+    finally:
+        connection.close()

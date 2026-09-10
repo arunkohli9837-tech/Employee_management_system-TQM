@@ -1,5 +1,5 @@
 from database.database import get_connection
-
+from services.validation_service import validate_employee_fields
 
 def _employee_row_to_dict(row):
     if row is None:
@@ -64,38 +64,25 @@ def create_employee(
     joining_date: str,
 ):
     """Create a new employee record and return its database ID."""
+    validated = validate_employee_fields(
+        employee_code,
+        full_name,
+        email,
+        phone,
+        department,
+        designation,
+        salary,
+        joining_date,
+    )
 
-    employee_code = employee_code.strip()
-    full_name = full_name.strip()
-    email = email.strip()
-    phone = phone.strip()
-    department = department.strip()
-    designation = designation.strip()
-    joining_date = joining_date.strip()
-
-    if not employee_code:
-        raise ValueError("Employee code must not be empty.")
-
-    if not full_name:
-        raise ValueError("Full name must not be empty.")
-
-    if not email:
-        raise ValueError("Email must not be empty.")
-
-    if not phone:
-        raise ValueError("Phone must not be empty.")
-
-    if not department:
-        raise ValueError("Department must not be empty.")
-
-    if not designation:
-        raise ValueError("Designation must not be empty.")
-
-    if not joining_date:
-        raise ValueError("Joining date must not be empty.")
-
-    if salary < 0:
-        raise ValueError("Salary must not be negative.")
+    employee_code = validated["employee_code"]
+    full_name = validated["full_name"]
+    email = validated["email"]
+    phone = validated["phone"]
+    department = validated["department"]
+    designation = validated["designation"]
+    salary = validated["salary"]
+    joining_date = validated["joining_date"]
 
     connection = get_connection()
 
@@ -223,37 +210,26 @@ def update_employee(
 ):
     """Update an existing employee record."""
 
-    employee_code = employee_code.strip()
-    full_name = full_name.strip()
-    email = email.strip()
-    phone = phone.strip()
-    department = department.strip()
-    designation = designation.strip()
-    joining_date = joining_date.strip()
+    validated = validate_employee_fields(
+        employee_code,
+        full_name,
+        email,
+        phone,
+        department,
+        designation,
+        salary,
+        joining_date,
+    )
 
-    if not employee_code:
-        raise ValueError("Employee code must not be empty.")
 
-    if not full_name:
-        raise ValueError("Full name must not be empty.")
-
-    if not email:
-        raise ValueError("Email must not be empty.")
-
-    if not phone:
-        raise ValueError("Phone must not be empty.")
-
-    if not department:
-        raise ValueError("Department must not be empty.")
-
-    if not designation:
-        raise ValueError("Designation must not be empty.")
-
-    if not joining_date:
-        raise ValueError("Joining date must not be empty.")
-
-    if salary < 0:
-        raise ValueError("Salary must not be negative.")
+    employee_code = validated["employee_code"]
+    full_name = validated["full_name"]
+    email = validated["email"]
+    phone = validated["phone"]
+    department = validated["department"]
+    designation = validated["designation"]
+    salary = validated["salary"]
+    joining_date = validated["joining_date"]
 
     connection = get_connection()
 

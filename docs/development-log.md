@@ -504,3 +504,30 @@ Implement service-layer functionality to retrieve and search audit log records.
 - No unexpected error occurred during testing.
 
 **Status:** Completed.
+## Commit 27 — Implement input validation
+
+**Objective:**  
+Strengthen employee data validation before database operations.
+
+**Work completed:**
+- Added `services/validation_service.py`.
+- Implemented reusable required-field validation.
+- Added email format validation.
+- Added phone format validation.
+- Added numeric and non-negative salary validation.
+- Integrated common validation into employee creation.
+- Integrated common validation into employee update.
+- Preserved existing database constraints.
+
+**Testing:**
+- Valid email, phone, and salary values were accepted.
+- Invalid email was rejected.
+- Invalid phone was rejected.
+- Negative salary was rejected.
+- Non-numeric salary was rejected.
+- Valid employee creation completed successfully.
+- Created employee was successfully retrieved from SQLite.
+- Application startup and existing functionality remained operational.
+- No unexpected error occurred during testing.
+
+**Status:** Completed.

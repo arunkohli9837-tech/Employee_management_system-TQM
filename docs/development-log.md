@@ -480,3 +480,27 @@ Implement a reusable audit logging service and record successful user login acti
 - No unexpected error occurred during testing.
 
 **Status:** Completed.
+## Commit 26 — Implement audit log viewer and search service
+
+**Objective:**  
+Implement service-layer functionality to retrieve and search audit log records.
+
+**Work completed:**
+- Added audit log row-to-dictionary conversion.
+- Implemented `get_all_audit_logs()`.
+- Implemented `search_audit_logs()`.
+- Added searching by username, action, target type, and description.
+- Added newest-first ordering for audit records.
+- Used parameterized SQL queries for search operations.
+- Safely handled empty search terms.
+
+**Testing:**
+- Audit log retrieval completed successfully.
+- Existing audit records were returned correctly.
+- `LOGIN` action search worked correctly.
+- Username search for `employee_test` worked correctly.
+- Empty search returned an empty list.
+- All affected Python files compiled successfully.
+- No unexpected error occurred during testing.
+
+**Status:** Completed.

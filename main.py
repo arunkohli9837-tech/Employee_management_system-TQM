@@ -3,6 +3,7 @@ import customtkinter as ctk
 from services.session import Session
 from ui.login import LoginFrame
 from ui.dashboard import DashboardFrame
+from ui.employees import EmployeeManagementFrame
 
 
 class EmployeeManagementApp(ctk.CTk):
@@ -43,16 +44,35 @@ class EmployeeManagementApp(ctk.CTk):
 
         self.show_dashboard(current_user)
 
-    def show_dashboard(self, user):
+    def show_dashboard(self, user=None):
         self.clear_current_frame()
+
+        current_user = user or self.session.get_current_user()
 
         self.dashboard_frame = DashboardFrame(
             self,
-            user=user,
+            user=current_user,
             on_logout=self.handle_logout,
+            on_employee_management=self.show_employee_management,
         )
 
         self.dashboard_frame.pack(
+            expand=True,
+            fill="both",
+        )
+
+    def show_employee_management(self):
+        self.clear_current_frame()
+
+        current_user = self.session.get_current_user()
+
+        self.employee_frame = EmployeeManagementFrame(
+            self,
+            user=current_user,
+            on_back=self.show_dashboard,
+        )
+
+        self.employee_frame.pack(
             expand=True,
             fill="both",
         )

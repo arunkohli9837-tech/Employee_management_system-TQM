@@ -4,11 +4,12 @@ from services.access_control import has_permission
 
 
 class DashboardFrame(ctk.CTkFrame):
-    def __init__(self, master, user, on_logout):
+    def __init__(self, master, user, on_logout, on_employee_management):
         super().__init__(master)
 
         self.user = user
         self.on_logout = on_logout
+        self.on_employee_management = on_employee_management
 
         self.grid_columnconfigure(1, weight=1)
         self.grid_rowconfigure(0, weight=1)
@@ -52,7 +53,7 @@ class DashboardFrame(ctk.CTkFrame):
             self.employee_button = ctk.CTkButton(
                 self.sidebar,
                 text="Employee Management",
-                state="disabled",
+                command=self.on_employee_management,
             )
             self.employee_button.pack(
                 fill="x",

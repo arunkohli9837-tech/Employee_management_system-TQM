@@ -561,3 +561,44 @@ Create the first proper post-login application screen and establish the main rol
 - No unexpected error occurred during testing.
 
 **Status:** Completed.
+## Commit 29 — Create Employee Management GUI Foundation
+
+**Objective:**  
+Create the basic Employee Management interface and establish the initial navigation between the Dashboard and Employee Management screen.
+
+**Work completed:**
+- Added the Employee Management GUI foundation.
+- Added fields for Employee Code, Full Name, Email, Phone, Department, Designation, Salary, and Joining Date.
+- Added Employee Records display area.
+- Added basic employee action buttons.
+- Added Clear Form functionality.
+- Added Back to Dashboard functionality.
+- Connected Employee Management navigation with the main application flow.
+- Kept database operations outside the GUI foundation so that functionality can be implemented incrementally in later commits.
+
+**Issue encountered during implementation:**
+- Clicking Employee Management initially caused:
+  `AttributeError: 'DashboardFrame' object has no attribute 'show_dashboard'`.
+
+**Cause of issue:**
+- The Dashboard was trying to handle navigation back to itself through a `show_dashboard()` method that did not exist inside `DashboardFrame`.
+- Navigation responsibilities were mixed between `DashboardFrame` and `main.py`.
+
+**Fix implemented:**
+- Moved Employee Management navigation responsibility to `main.py`.
+- Added the `show_employee_management()` method to `EmployeeManagementApp`.
+- Passed `self.show_employee_management` from `main.py` to `DashboardFrame`.
+- Connected the Employee Management button to the supplied callback.
+- Removed the obsolete `open_employee_management()` method from `DashboardFrame`.
+- Employee Management now sends its Back action to `main.py`, which recreates the Dashboard.
+
+**Testing:**
+- Application started successfully.
+- Login flow worked successfully.
+- Employee Management button opened the Employee Management screen successfully.
+- Employee Management GUI fields and records area displayed correctly.
+- Back to Dashboard worked successfully.
+- Logout returned to the Login screen successfully.
+- No unexpected error occurred after the fix.
+
+**Status:** Completed.

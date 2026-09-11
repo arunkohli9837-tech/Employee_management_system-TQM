@@ -531,3 +531,33 @@ Strengthen employee data validation before database operations.
 - No unexpected error occurred during testing.
 
 **Status:** Completed.
+## Commit 28 — Implement Dashboard and Main Navigation
+
+**Objective:**  
+Create the first proper post-login application screen and establish the main role-based navigation flow.
+
+**Work completed:**
+- Added `ui/dashboard.py`.
+- Implemented the main Dashboard interface.
+- Displayed the logged-in username and role.
+- Added role-based navigation using the existing RBAC permission system.
+- Added navigation options for Employee Management, User Management, Audit Logs, and Backup & Recovery.
+- Marked features whose GUI screens are not yet implemented as unavailable.
+- Implemented Logout functionality.
+- Updated `main.py` to transition from Login to Dashboard after successful authentication.
+- Updated logout flow to clear the current session and return to the Login screen.
+- Removed the previous duplicate login-success handling from `main.py`.
+
+**Testing:**
+- Login screen opened successfully.
+- Admin login successfully opened the Dashboard.
+- Admin navigation options were displayed correctly.
+- HR login successfully opened the Dashboard with appropriate navigation options.
+- Employee login successfully opened the Dashboard with appropriate navigation options.
+- Logout successfully cleared the session and returned to the Login screen.
+- No duplicate application window was created.
+- Existing authentication and RBAC functionality remained operational.
+- Affected Python files compiled successfully.
+- No unexpected error occurred during testing.
+
+**Status:** Completed.

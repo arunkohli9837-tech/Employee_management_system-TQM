@@ -630,3 +630,37 @@ Connect the Employee Management GUI with the existing employee service layer so 
 - No unexpected error occurred during testing.
 
 **Status:** Completed.
+## Commit 31 — Connect Add Employee with Validation
+
+**Objective:**  
+Connect the Add Employee GUI action with the existing employee creation service and strengthen validation for employee input.
+
+**Work completed:**
+- Connected the Add Employee button in the Employee Management GUI with the existing `create_employee()` service.
+- Reused the existing employee validation service before database insertion.
+- Added joining date format validation.
+- Joining date is now required in `DD-MM-YYYY` format.
+- Invalid joining dates are rejected before database insertion.
+- Valid employee details are passed to the existing employee service.
+- Employee records are refreshed automatically after a successful addition.
+- Clear Form functionality continues to work after employee creation.
+- Kept Update and Deactivate functionality disabled for the next development stages.
+- Maintained separation between the GUI, service layer, validation layer, and database layer.
+
+**Validation behavior:**
+- Valid joining dates such as `11-09-2026` are accepted.
+- Incorrect date formats are rejected.
+- Invalid calendar dates are rejected.
+- Other existing employee validations for required fields, email, phone, and salary remain active.
+
+**Testing:**
+- Add Employee functionality was tested successfully.
+- Valid employee data was accepted successfully.
+- Employee record was added and displayed in the employee records area.
+- Invalid joining date formats were rejected correctly.
+- Invalid calendar dates were rejected correctly.
+- Existing validation behavior remained functional.
+- Employee Management search and view functionality remained operational.
+- No unexpected error occurred during testing.
+
+**Status:** Completed.

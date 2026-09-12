@@ -2,11 +2,9 @@
 
 ## 1. Purpose
 
-This document defines the initial database design for the Employee Management System.
+This document describes the SQLite database structure currently defined by the project schema and the reliability controls associated with it.
 
-The application will use SQLite as its primary local database.
-
-The design is based on the current project requirements and architecture and may be refined during actual implementation when a genuine requirement or technical constraint is identified.
+The database is accessed from Python through the `sqlite3` library and is kept separate from the GUI layer.
 
 ---
 
@@ -15,17 +13,17 @@ The design is based on the current project requirements and architecture and may
 | Item | Decision |
 |---|---|
 | Database | SQLite |
-| Python Library | sqlite3 |
+| Python Library | `sqlite3` |
 | Database Type | Local relational database |
 | Primary Usage | Employee and system data storage |
-| Integrity | Constraints and transactions |
-| Backup | SQLite database backup/recovery mechanisms |
+| Integrity | Primary keys, foreign keys, UNIQUE, NOT NULL, CHECK constraints, and transactions |
+| Backup | Database backup/recovery mechanisms planned for later implementation |
 
 ---
 
-## 3. Planned Tables
+## 3. Current Schema
 
-The initial database design contains the following tables:
+The current `database/schema.sql` defines five tables:
 
 1. `users`
 2. `employees`
@@ -33,133 +31,90 @@ The initial database design contains the following tables:
 4. `error_logs`
 5. `backup_history`
 
-Additional tables may be introduced if an actual implementation requirement justifies them.
+These tables form the database foundation for authentication, employee management, auditability, error logging, and backup/recovery functionality.
 
 ---
 
 # 4. Users Table
 
-The `users` table will store application account information.
-
-## Purpose
-
-It will support:
-
-- Authentication
-- Role management
-- Account status
-- Current-user identification
-- User administration
-
-## Planned Fields
+The `users` table stores application account information.
 
 | Field | Type | Constraints / Purpose |
 |---|---|---|
 | id | INTEGER | Primary Key |
-| username | TEXT | Required, Unique |
-| password_hash | TEXT | Required |
-| role | TEXT | Required, Valid Role |
-| is_active | INTEGER | Required, Account status |
-| created_at | TEXT | Required |
-| updated_at | TEXT | Required |
+| username | TEXT | NOT NULL, UNIQUE, case-insensitive |
+| password_hash | TEXT | NOT NULL |
+| role | TEXT | NOT NULL, CHECK: Admin / HR / Employee |
+| is_active | INTEGER | NOT NULL, CHECK: 0 / 1 |
+| created_at | TEXT | NOT NULL, timestamp |
+| updated_at | TEXT | NOT NULL, timestamp |
 
-### Role Values
-
-The planned roles are:
+### Roles
 
 - Admin
 - HR
 - Employee
 
-The implementation may use an appropriate database representation for these values.
-
 ### Reliability Considerations
 
-- Username uniqueness should be enforced.
-- Required account fields should not accept NULL values.
-- Invalid roles should be prevented.
-- Account status should be controlled by the application and database rules where appropriate.
+- Username uniqueness is enforced by the database.
+- Invalid roles are prevented by a `CHECK` constraint.
+- Account status is restricted to active/inactive values.
+- Password hashes are stored instead of plain-text passwords.
 
 ---
 
 # 5. Employees Table
 
-The `employees` table will store employee information.
-
-## Purpose
-
-It will support:
-
-- Employee creation
-- Employee viewing
-- Employee search
-- Employee updates
-- Employee deactivation
-
-## Planned Fields
+The `employees` table stores employee information.
 
 | Field | Type | Constraints / Purpose |
 |---|---|---|
 | id | INTEGER | Primary Key |
-| employee_code | TEXT | Required, Unique |
-| full_name | TEXT | Required |
-| email | TEXT | Required, Unique |
-| phone | TEXT | Required/Validated |
-| department | TEXT | Required |
-| designation | TEXT | Required |
-| salary | REAL | Required, Non-negative |
-| joining_date | TEXT | Required |
-| status | TEXT | Required |
-| created_at | TEXT | Required |
-| updated_at | TEXT | Required |
+| employee_code | TEXT | NOT NULL, UNIQUE, case-insensitive |
+| full_name | TEXT | NOT NULL |
+| email | TEXT | NOT NULL, UNIQUE, case-insensitive |
+| phone | TEXT | NOT NULL; application validated |
+| department | TEXT | NOT NULL |
+| designation | TEXT | NOT NULL |
+| salary | REAL | NOT NULL, CHECK salary >= 0 |
+| joining_date | TEXT | NOT NULL; application validated as `DD-MM-YYYY` |
+| status | TEXT | NOT NULL, CHECK: Active / Inactive |
+| created_at | TEXT | NOT NULL, timestamp |
+| updated_at | TEXT | NOT NULL, timestamp |
 
 ### Employee Status
 
-The application is expected to support an active/inactive state rather than permanently deleting historical employee information.
+Employees are deactivated by changing their status to `Inactive` instead of permanently deleting the database record.
 
 ### Reliability Considerations
 
-- Employee code should be unique.
-- Employee email should be unique.
-- Required fields should be protected against NULL values.
-- Salary should not be negative.
-- Employee deactivation should preserve historical information.
-- Appropriate database constraints should provide a second layer of protection in addition to UI validation.
+- Employee code and email uniqueness are enforced by the database.
+- Required fields use `NOT NULL`.
+- Salary cannot be negative because of a database `CHECK` constraint.
+- Joining date format is validated by the application before insertion/update.
+- Soft deactivation preserves historical employee information.
+- Application validation provides an additional protection layer before database constraints.
 
 ---
 
 # 6. Audit Logs Table
 
-The `audit_logs` table will provide traceability for important operations.
-
-## Purpose
-
-It will help with:
-
-- Accountability
-- Traceability
-- Reliability analysis
-- Reviewing important operations
-
-## Planned Fields
+The `audit_logs` table provides traceability for important operations.
 
 | Field | Type | Constraints / Purpose |
 |---|---|---|
 | id | INTEGER | Primary Key |
-| user_id | INTEGER | Foreign Key to users |
-| username | TEXT | Recorded username where useful |
+| user_id | INTEGER | Foreign Key to `users`, `ON DELETE SET NULL` |
+| username | TEXT | Recorded username where applicable |
 | action | TEXT | Operation performed |
 | target_type | TEXT | Object affected |
 | target_id | INTEGER | Affected record ID where applicable |
 | description | TEXT | Operation details |
 | status | TEXT | Operation result |
-| created_at | TEXT | Timestamp |
+| created_at | TEXT | NOT NULL, timestamp |
 
 ### Relationship
-
-A log entry may reference the user who performed the operation.
-
-Conceptually:
 
 ```text
 users
@@ -169,3 +124,97 @@ users
   | many
   v
 audit_logs
+```
+
+Successful authentication is currently integrated with audit logging. Additional auditable operations can be connected as those features are implemented.
+
+---
+
+# 7. Error Logs Table
+
+The `error_logs` table provides a database location for technical application error records.
+
+| Field | Type | Constraints / Purpose |
+|---|---|---|
+| id | INTEGER | Primary Key |
+| user_id | INTEGER | Foreign Key to `users`, `ON DELETE SET NULL` |
+| error_type | TEXT | NOT NULL |
+| message | TEXT | NOT NULL |
+| module | TEXT | Module where the error occurred |
+| created_at | TEXT | NOT NULL, timestamp |
+
+This table exists in the current schema. Application-level error logging is planned for a later reliability milestone.
+
+---
+
+# 8. Backup History Table
+
+The `backup_history` table is defined for recording backup and restore operations.
+
+| Field | Type | Constraints / Purpose |
+|---|---|---|
+| id | INTEGER | Primary Key |
+| operation | TEXT | NOT NULL, CHECK: Backup / Restore |
+| file_path | TEXT | NOT NULL |
+| status | TEXT | Operation result |
+| initiated_by | INTEGER | Foreign Key to `users`, `ON DELETE SET NULL` |
+| created_at | TEXT | NOT NULL, timestamp |
+| description | TEXT | Additional operation information |
+
+Backup and recovery service/GUI functionality is planned for a later milestone.
+
+---
+
+# 9. Database Relationships
+
+```text
+                 +----------------+
+                 |     users      |
+                 +----------------+
+                  |      |      |
+                  |      |      +--------------------+
+                  |      |                           |
+                  v      v                           v
+            audit_logs  backup_history          error_logs
+
+                 employees
+            (independent master data)
+```
+
+The foreign-key relationships connect system activity and operational history to the user account that initiated an operation where applicable.
+
+---
+
+# 10. Reliability Controls
+
+The database design supports reliability through:
+
+- Primary keys for record identity.
+- UNIQUE constraints for usernames, employee codes, and employee emails.
+- NOT NULL constraints for required data.
+- CHECK constraints for roles, account status, employee status, salary, and backup operation type.
+- Foreign keys for traceability relationships.
+- Parameterized SQL in implemented service operations.
+- Transaction commit/rollback handling in implemented write operations.
+- Application-level validation before employee database operations.
+
+---
+
+# 11. Implementation Status
+
+### Implemented
+
+- SQLite connection layer.
+- Current database schema.
+- User authentication data.
+- Employee CRUD/deactivation service operations.
+- Employee search service.
+- Audit-log creation, retrieval, and search service.
+- Employee input validation.
+
+### Planned
+
+- Backup creation and restore workflow.
+- Backup history service integration.
+- Application-level error-log integration.
+- GUI screens for User Management, Audit Logs, and Backup & Recovery.

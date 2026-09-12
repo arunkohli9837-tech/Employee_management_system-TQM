@@ -1,62 +1,127 @@
-# Employee Management System — Initial System Flow
+# Employee Management System — System Flow
 
 ## Purpose
 
-This diagram represents the initial high-level flow of the Employee Management System.
+This diagram represents the current application flow after the implemented authentication, session, dashboard, Employee Management, search, and Add Employee milestones.
 
-It is based on the current requirements and initial application architecture.
-
-The diagram is intentionally high-level. Detailed authentication, employee management, database, error recovery, and backup/recovery flows will be documented separately when those parts of the system are designed and implemented.
+Features not yet implemented in the GUI are explicitly marked as planned rather than shown as completed flows.
 
 ---
 
-## High-Level System Flow
+## Current High-Level Flow
 
 ```mermaid
 flowchart TD
     A[Start Application] --> B[Login Screen]
-
     B --> C[Enter Username and Password]
-
     C --> D{Authentication Successful?}
 
-    D -- No --> E[Show Login Error]
+    D -- No --> E[Show Login Feedback]
     E --> B
 
-    D -- Yes --> F[Create Authenticated Session]
+    D -- Yes --> F[Create Current User Session]
+    F --> G[Dashboard]
 
-    F --> G{Determine User Role}
+    G --> H{Select Authorized Option}
 
-    G --> H[Admin Area]
-    G --> I[HR Area]
-    G --> J[Employee Area]
+    H --> I[Employee Management]
+    H --> J[Planned User Management]
+    H --> K[Planned Audit Logs]
+    H --> L[Planned Backup & Recovery]
 
-    H --> K[Perform Authorized Operation]
-    I --> K
-    J --> K
+    I --> M[Load Employee Records]
+    M --> N{Search Required?}
+    N -- Yes --> O[Search Employee Records]
+    N -- No --> P[Display Employee Records]
+    O --> P
 
-    K --> L[Validate Input]
+    P --> Q{Employee Operation}
+    Q --> R[Add Employee]
+    Q --> S[Planned Select / Update / Deactivate GUI Actions]
 
-    L --> M{Input Valid?}
+    R --> T[Validate Employee Input]
+    T --> U{Input Valid?}
+    U -- No --> V[Show Validation Feedback]
+    V --> R
+    U -- Yes --> W[Create Employee Service]
+    W --> X[SQLite Database]
+    X --> Y[Refresh Employee Records]
+    Y --> P
 
-    M -- No --> N[Show Validation Feedback]
-    N --> K
+    P --> Z[Back to Dashboard]
+    Z --> G
 
-    M -- Yes --> O[Execute Business Operation]
+    G --> AA[Logout]
+    AA --> AB[Clear Session]
+    AB --> B
+```
 
-    O --> P[Database Operation]
+---
 
-    P --> Q{Operation Successful?}
+## 2. Current Layered Operation Flow
 
-    Q -- No --> R[Handle Failure Safely]
-    R --> S[Show User-Friendly Message]
-    S --> K
+```text
+GUI
+ ↓
+Service Layer
+ ↓
+Validation / Business Rules
+ ↓
+Database Layer
+ ↓
+SQLite
+```
 
-    Q -- Yes --> T[Show Updated Result]
+For employee creation, the current flow is:
 
-    T --> U{Continue Using System?}
+```text
+Add Employee Form
+       ↓
+Collect Input
+       ↓
+validate_employee_fields()
+       ↓
+Valid? ── No → User Feedback
+       ↓ Yes
+create_employee()
+       ↓
+SQLite INSERT
+       ↓
+Commit
+       ↓
+Refresh Employee List
+```
 
-    U -- Yes --> K
-    U -- No --> V[Logout]
+---
 
-    V --> W[End]
+## 3. Navigation Flow
+
+Top-level navigation is coordinated by `main.py` through callbacks.
+
+```text
+Login
+  ↓
+Dashboard
+  ↓
+Employee Management
+  ↓
+Back
+  ↓
+Dashboard
+  ↓
+Logout
+  ↓
+Login
+```
+
+---
+
+## 4. Planned Extensions
+
+The following flows will be documented in more detail when their implementation milestones are completed:
+
+- User Management
+- Audit Log viewing
+- Backup and Recovery
+- Centralized application error logging and recovery
+- TQM reliability analysis workflow

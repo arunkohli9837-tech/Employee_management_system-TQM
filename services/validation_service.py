@@ -1,4 +1,5 @@
 import re
+from datetime import datetime
 
 
 EMAIL_PATTERN = re.compile(
@@ -56,6 +57,15 @@ def validate_salary(salary) -> float:
 
     return salary
 
+def validate_joining_date(joining_date: str) -> str:
+    joining_date = validate_required(joining_date, "Joining date")
+
+    try:
+        datetime.strptime(joining_date, "%d-%m-%Y")
+    except ValueError:
+        raise ValueError("Joining date must be in DD-MM-YYYY format.")
+
+    return joining_date
 
 def validate_employee_fields(
     employee_code: str,
@@ -85,7 +95,5 @@ def validate_employee_fields(
             designation, "Designation"
         ),
         "salary": validate_salary(salary),
-        "joining_date": validate_required(
-            joining_date, "Joining date"
-        ),
+        "joining_date": validate_joining_date(joining_date),
     }

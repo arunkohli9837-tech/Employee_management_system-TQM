@@ -271,10 +271,12 @@ Negative salary values shall not be accepted.
 ### FR-VALID-07
 Joining date input shall be validated according to the required date format.
 
+**Current implementation:** Joining dates are accepted in `DD-MM-YYYY` format and invalid calendar dates are rejected.
+
 ### FR-VALID-08
 Invalid input shall be rejected with understandable user feedback.
 
-Exact validation formats and length limits will be finalized during implementation based on actual system requirements.
+The currently implemented joining-date format is `DD-MM-YYYY`. Other validation formats and length limits may be refined during implementation when a genuine requirement or technical constraint is identified.
 
 ---
 
@@ -544,6 +546,26 @@ The system should improve reliability through:
 - Functional and reliability testing
 
 Reliability claims shall be based on implemented and tested functionality rather than assumptions.
+
+---
+
+## 11.1 Current Implementation Snapshot
+
+At the current development stage, the following requirements have corresponding implemented functionality:
+
+- User authentication and logout
+- Current-user session handling
+- Role-based permission mapping and service-level permission enforcement
+- Employee creation, viewing, searching, updating, and soft deactivation at the service layer
+- Employee input validation for required fields, email, phone, salary, and joining date
+- Joining date validation in `DD-MM-YYYY` format
+- Audit-log creation for successful authentication events
+- Audit-log retrieval and search at the service layer
+- Dashboard and Employee Management GUI navigation
+- Employee viewing and search through the GUI
+- Add Employee operation through the GUI
+
+Features such as User Management GUI, Audit Logs GUI, Backup & Recovery GUI, application-wide error logging/recovery, and the remaining TQM analysis artifacts are planned for later milestones unless a later development log entry records their completion.
 
 ---
 

@@ -602,3 +602,31 @@ Create the basic Employee Management interface and establish the initial navigat
 - No unexpected error occurred after the fix.
 
 **Status:** Completed.
+## Commit 30 — Connect Employee View and Search
+
+**Objective:**  
+Connect the Employee Management GUI with the existing employee service layer so that employee records can be viewed and searched from the application.
+
+**Work completed:**
+- Connected the Employee Management GUI with `employee_service.py`.
+- Added automatic loading of existing employee records when the screen opens.
+- Added an employee search field.
+- Implemented search by employee code, name, and email using the existing search service.
+- Added a Clear Search option to restore all employee records.
+- Added a message for cases where no matching employee records are found.
+- Displayed employee details including employee code, name, email, phone, department, designation, salary, and status.
+- Kept Add, Update, and Deactivate functionality disabled because these features will be implemented incrementally in later commits.
+- Maintained separation between the GUI, service layer, and database layer.
+
+**Testing:**
+- Employee Management screen loaded successfully.
+- Existing employee records were displayed successfully.
+- Employee search worked successfully.
+- Search by existing employee information returned the relevant records.
+- Clear Search restored the complete employee list.
+- Empty search restored all employee records.
+- A search with no matching result displayed the appropriate message.
+- Back to Dashboard navigation continued to work correctly.
+- No unexpected error occurred during testing.
+
+**Status:** Completed.

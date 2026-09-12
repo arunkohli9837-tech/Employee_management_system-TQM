@@ -14,280 +14,309 @@ class EmployeeManagementFrame(ctk.CTkFrame):
 
         self.user = user
         self.on_back = on_back
+        self.selected_employee_id = None
 
-        self.grid_columnconfigure(0, weight=1)
-        self.grid_rowconfigure(2, weight=1)
+        self.entries = {}
+
+        self.grid_columnconfigure(0, weight=0, minsize=390)
+        self.grid_columnconfigure(1, weight=1)
+        self.grid_rowconfigure(1, weight=1)
 
         self.create_header()
-        self.create_form()
-        self.create_list_area()
+        self.create_form_panel()
+        self.create_records_panel()
 
         self.load_employees()
 
+    # ---------------------------------------------------------
+    # HEADER
+    # ---------------------------------------------------------
+
     def create_header(self):
-        header = ctk.CTkFrame(self)
-        header.grid(
+        self.header = ctk.CTkFrame(self, fg_color="transparent")
+        self.header.grid(
             row=0,
             column=0,
+            columnspan=2,
             sticky="ew",
-            padx=20,
-            pady=20,
+            padx=30,
+            pady=(25, 15),
         )
 
-        header.grid_columnconfigure(0, weight=1)
+        self.header.grid_columnconfigure(0, weight=1)
 
-        title = ctk.CTkLabel(
-            header,
+        self.title_label = ctk.CTkLabel(
+            self.header,
             text="Employee Management",
-            font=ctk.CTkFont(size=26, weight="bold"),
+            font=ctk.CTkFont(size=28, weight="bold"),
         )
-        title.grid(
+        self.title_label.grid(
             row=0,
             column=0,
-            padx=15,
-            pady=10,
             sticky="w",
         )
 
-        back_button = ctk.CTkButton(
-            header,
+        self.back_button = ctk.CTkButton(
+            self.header,
             text="Back to Dashboard",
+            width=150,
             command=self.on_back,
         )
-        back_button.grid(
+        self.back_button.grid(
             row=0,
             column=1,
-            padx=15,
-            pady=10,
+            padx=(10, 0),
         )
 
-    def create_form(self):
-        form = ctk.CTkFrame(self)
-        form.grid(
+    # ---------------------------------------------------------
+    # LEFT FORM
+    # ---------------------------------------------------------
+
+    def create_form_panel(self):
+        self.form_panel = ctk.CTkFrame(self)
+        self.form_panel.grid(
             row=1,
             column=0,
-            sticky="ew",
-            padx=20,
-            pady=10,
+            sticky="nsew",
+            padx=(30, 12),
+            pady=(0, 30),
         )
 
-        for column in range(4):
-            form.grid_columnconfigure(column, weight=1)
+        self.form_panel.grid_columnconfigure(0, weight=1)
+        self.form_panel.grid_rowconfigure(1, weight=1)
 
-        self.employee_code_entry = self.create_field(
-            form, "Employee Code", 0, 0
+        self.form_title = ctk.CTkLabel(
+            self.form_panel,
+            text="Employee Details",
+            font=ctk.CTkFont(size=21, weight="bold"),
         )
-
-        self.name_entry = self.create_field(
-            form, "Full Name", 0, 1
-        )
-
-        self.email_entry = self.create_field(
-            form, "Email", 0, 2
-        )
-
-        self.phone_entry = self.create_field(
-            form, "Phone", 0, 3
-        )
-
-        self.department_entry = self.create_field(
-            form, "Department", 2, 0
-        )
-
-        self.designation_entry = self.create_field(
-            form, "Designation", 2, 1
-        )
-
-        self.salary_entry = self.create_field(
-            form, "Salary", 2, 2
-        )
-
-        self.joining_date_entry = self.create_field(
-            form, "Joining Date", 2, 3
-        )
-
-        self.add_button = ctk.CTkButton(
-            form,
-            text="Add Employee",
-            command=self.add_employee,
-        )
-        self.add_button.grid(
-            row=4,
+        self.form_title.grid(
+            row=0,
             column=0,
-            padx=10,
-            pady=15,
+            sticky="w",
+            padx=25,
+            pady=(25, 15),
         )
 
-        self.update_button = ctk.CTkButton(
-            form,
-            text="Update Employee",
-            state="disabled",
+        self.form_scroll = ctk.CTkScrollableFrame(
+            self.form_panel,
+            fg_color="transparent",
         )
-        self.update_button.grid(
-            row=4,
-            column=1,
-            padx=10,
-            pady=15,
-        )
-
-        self.deactivate_button = ctk.CTkButton(
-            form,
-            text="Deactivate",
-            state="disabled",
-        )
-        self.deactivate_button.grid(
-            row=4,
-            column=2,
-            padx=10,
-            pady=15,
-        )
-
-        self.clear_button = ctk.CTkButton(
-            form,
-            text="Clear",
-            command=self.clear_form,
-        )
-        self.clear_button.grid(
-            row=4,
-            column=3,
-            padx=10,
-            pady=15,
-        )
-
-        self.status_label = ctk.CTkLabel(
-            form,
-            text="",
-        )
-        self.status_label.grid(
-            row=5,
+        self.form_scroll.grid(
+            row=1,
             column=0,
-            columnspan=4,
+            sticky="nsew",
             padx=10,
             pady=(0, 10),
         )
 
-    def create_field(self, parent, label_text, row, column):
-        label = ctk.CTkLabel(
-            parent,
-            text=label_text,
-        )
-        label.grid(
-            row=row,
-            column=column,
-            padx=10,
-            pady=(10, 2),
-            sticky="w",
-        )
+        self.form_scroll.grid_columnconfigure(0, weight=1)
 
-        entry = ctk.CTkEntry(parent)
-        entry.grid(
-            row=row + 1,
-            column=column,
-            padx=10,
-            pady=(2, 10),
-            sticky="ew",
+        self.create_form_fields()
+
+        self.action_frame = ctk.CTkFrame(
+            self.form_panel,
+            fg_color="transparent",
         )
-
-        return entry
-
-    def create_list_area(self):
-        self.list_area = ctk.CTkScrollableFrame(self)
-        self.list_area.grid(
+        self.action_frame.grid(
             row=2,
             column=0,
-            sticky="nsew",
-            padx=20,
-            pady=10,
+            sticky="ew",
+            padx=25,
+            pady=(5, 25),
         )
 
-        self.list_area.grid_columnconfigure(0, weight=1)
+        self.action_frame.grid_columnconfigure(0, weight=1)
 
-        self.records_title = ctk.CTkLabel(
-            self.list_area,
-            text="Employee Records",
-            font=ctk.CTkFont(size=20, weight="bold"),
+        self.add_button = ctk.CTkButton(
+            self.action_frame,
+            text="Add Employee",
+            height=38,
+            command=self.add_employee,
         )
-        self.records_title.grid(
+        self.add_button.grid(
             row=0,
             column=0,
-            padx=20,
-            pady=(10, 15),
-            sticky="w",
+            sticky="ew",
+            pady=(0, 8),
         )
 
-        search_area = ctk.CTkFrame(self.list_area)
-        search_area.grid(
+        self.update_button = ctk.CTkButton(
+            self.action_frame,
+            text="Update Employee",
+            height=38,
+            state="disabled",
+        )
+        self.update_button.grid(
             row=1,
             column=0,
             sticky="ew",
-            padx=10,
-            pady=5,
+            pady=4,
         )
 
-        search_area.grid_columnconfigure(0, weight=1)
+        self.deactivate_button = ctk.CTkButton(
+            self.action_frame,
+            text="Deactivate Employee",
+            height=38,
+            fg_color="#b91c1c",
+            hover_color="#991b1b",
+            state="disabled",
+        )
+        self.deactivate_button.grid(
+            row=2,
+            column=0,
+            sticky="ew",
+            pady=4,
+        )
+
+        self.clear_button = ctk.CTkButton(
+            self.action_frame,
+            text="Clear Form",
+            height=38,
+            fg_color="#4b5563",
+            hover_color="#374151",
+            command=self.clear_form,
+        )
+        self.clear_button.grid(
+            row=3,
+            column=0,
+            sticky="ew",
+            pady=(8, 0),
+        )
+
+    def create_form_fields(self):
+        fields = [
+            ("employee_code", "Employee Code"),
+            ("full_name", "Full Name"),
+            ("email", "Email"),
+            ("phone", "Phone"),
+            ("department", "Department"),
+            ("designation", "Designation"),
+            ("salary", "Salary"),
+            ("joining_date", "Joining Date (DD-MM-YYYY)"),
+        ]
+
+        for row, (key, placeholder) in enumerate(fields):
+            entry = ctk.CTkEntry(
+                self.form_scroll,
+                placeholder_text=placeholder,
+                height=38,
+            )
+            entry.grid(
+                row=row,
+                column=0,
+                sticky="ew",
+                padx=15,
+                pady=7,
+            )
+
+            self.entries[key] = entry
+
+    # ---------------------------------------------------------
+    # RIGHT RECORDS PANEL
+    # ---------------------------------------------------------
+
+    def create_records_panel(self):
+        self.records_panel = ctk.CTkFrame(self)
+        self.records_panel.grid(
+            row=1,
+            column=1,
+            sticky="nsew",
+            padx=(12, 30),
+            pady=(0, 30),
+        )
+
+        self.records_panel.grid_columnconfigure(0, weight=1)
+        self.records_panel.grid_rowconfigure(2, weight=1)
+
+        self.search_frame = ctk.CTkFrame(
+            self.records_panel,
+            fg_color="transparent",
+        )
+        self.search_frame.grid(
+            row=0,
+            column=0,
+            sticky="ew",
+            padx=20,
+            pady=(20, 10),
+        )
+
+        self.search_frame.grid_columnconfigure(0, weight=1)
 
         self.search_entry = ctk.CTkEntry(
-            search_area,
-            placeholder_text="Search by employee code, name or email",
+            self.search_frame,
+            placeholder_text="Search by name, code or email",
+            height=38,
         )
         self.search_entry.grid(
             row=0,
             column=0,
-            padx=(0, 10),
-            pady=5,
             sticky="ew",
+            padx=(0, 10),
         )
 
         self.search_button = ctk.CTkButton(
-            search_area,
+            self.search_frame,
             text="Search",
-            width=100,
+            width=90,
+            height=38,
             command=self.search_employee_records,
         )
         self.search_button.grid(
             row=0,
             column=1,
-            padx=5,
-            pady=5,
+            padx=(0, 8),
         )
 
-        self.clear_search_button = ctk.CTkButton(
-            search_area,
-            text="Clear",
-            width=100,
-            command=self.clear_search,
+        self.refresh_button = ctk.CTkButton(
+            self.search_frame,
+            text="Refresh",
+            width=90,
+            height=38,
+            command=self.load_employees,
         )
-        self.clear_search_button.grid(
+        self.refresh_button.grid(
             row=0,
             column=2,
-            padx=(5, 0),
-            pady=5,
         )
 
-        self.records_container = ctk.CTkFrame(
-            self.list_area,
-            fg_color="transparent",
+        self.records_title = ctk.CTkLabel(
+            self.records_panel,
+            text="Employee Records",
+            font=ctk.CTkFont(size=20, weight="bold"),
         )
-        self.records_container.grid(
+        self.records_title.grid(
+            row=1,
+            column=0,
+            sticky="w",
+            padx=25,
+            pady=(5, 10),
+        )
+
+        self.records_scroll = ctk.CTkScrollableFrame(
+            self.records_panel,
+        )
+        self.records_scroll.grid(
             row=2,
             column=0,
-            sticky="ew",
-            padx=10,
-            pady=5,
+            sticky="nsew",
+            padx=20,
+            pady=(0, 20),
         )
 
-        self.records_container.grid_columnconfigure(0, weight=1)
+        self.records_scroll.grid_columnconfigure(0, weight=1)
 
-    def clear_records(self):
-        for widget in self.records_container.winfo_children():
-            widget.destroy()
+    # ---------------------------------------------------------
+    # EMPLOYEE RECORD DISPLAY
+    # ---------------------------------------------------------
 
     def display_employees(self, employees):
-        self.clear_records()
+        for widget in self.records_scroll.winfo_children():
+            widget.destroy()
 
         if not employees:
             empty_label = ctk.CTkLabel(
-                self.records_container,
+                self.records_scroll,
                 text="No employee records found.",
                 font=ctk.CTkFont(size=15),
             )
@@ -295,89 +324,188 @@ class EmployeeManagementFrame(ctk.CTkFrame):
                 row=0,
                 column=0,
                 padx=20,
-                pady=20,
+                pady=30,
             )
             return
 
-        for index, employee in enumerate(employees):
-            employee_frame = ctk.CTkFrame(
-                self.records_container
-            )
-            employee_frame.grid(
-                row=index,
-                column=0,
-                sticky="ew",
-                padx=5,
-                pady=5,
-            )
+        header = ctk.CTkFrame(self.records_scroll)
+        header.grid(
+            row=0,
+            column=0,
+            sticky="ew",
+            padx=5,
+            pady=(0, 5),
+        )
 
-            employee_frame.grid_columnconfigure(0, weight=1)
+        columns = [
+            ("Code", 0),
+            ("Name", 1),
+            ("Email", 2),
+            ("Department", 3),
+            ("Designation", 4),
+            ("Salary", 5),
+            ("Status", 6),
+        ]
 
-            title = ctk.CTkLabel(
-                employee_frame,
-                text=(
-                    f"{employee['employee_code']} - "
-                    f"{employee['full_name']}"
-                ),
-                font=ctk.CTkFont(size=16, weight="bold"),
-            )
-            title.grid(
-                row=0,
-                column=0,
-                padx=15,
-                pady=(10, 5),
-                sticky="w",
-            )
+        for text, column in columns:
+            header.grid_columnconfigure(column, weight=1)
 
-            details = ctk.CTkLabel(
-                employee_frame,
-                text=(
-                    f"Email: {employee['email']}\n"
-                    f"Phone: {employee['phone']}\n"
-                    f"Department: {employee['department']}\n"
-                    f"Designation: {employee['designation']}\n"
-                    f"Salary: {employee['salary']}\n"
-                    f"Joining Date: {employee['joining_date']}\n"
-                    f"Status: {employee['status']}"
-                ),
+            label = ctk.CTkLabel(
+                header,
+                text=text,
+                font=ctk.CTkFont(size=12, weight="bold"),
                 anchor="w",
-                justify="left",
             )
-            details.grid(
-                row=1,
-                column=0,
-                padx=15,
-                pady=(5, 10),
-                sticky="w",
+            label.grid(
+                row=0,
+                column=column,
+                sticky="ew",
+                padx=6,
+                pady=8,
             )
+
+        for row_index, employee in enumerate(employees, start=1):
+            self.create_employee_row(row_index, employee)
+
+    def create_employee_row(self, row_index, employee):
+        row_frame = ctk.CTkFrame(
+            self.records_scroll,
+            fg_color=("gray92", "gray17"),
+        )
+        row_frame.grid(
+            row=row_index,
+            column=0,
+            sticky="ew",
+            padx=5,
+            pady=3,
+        )
+
+        for column in range(7):
+            row_frame.grid_columnconfigure(column, weight=1)
+
+        values = [
+            employee["employee_code"],
+            employee["full_name"],
+            employee["email"],
+            employee["department"],
+            employee["designation"],
+            f"{employee['salary']:.2f}",
+            employee["status"],
+        ]
+
+        for column, value in enumerate(values):
+            label = ctk.CTkLabel(
+                row_frame,
+                text=str(value),
+                anchor="w",
+                font=ctk.CTkFont(size=12),
+            )
+            label.grid(
+                row=0,
+                column=column,
+                sticky="ew",
+                padx=6,
+                pady=8,
+            )
+
+            label.bind(
+                "<Button-1>",
+                lambda event, emp=employee: self.select_employee(emp),
+            )
+
+        row_frame.bind(
+            "<Button-1>",
+            lambda event, emp=employee: self.select_employee(emp),
+        )
+
+    # ---------------------------------------------------------
+    # LOAD / SEARCH
+    # ---------------------------------------------------------
 
     def load_employees(self):
-        employees = get_all_employees()
-        self.display_employees(employees)
+        try:
+            employees = get_all_employees()
+            self.display_employees(employees)
+        except Exception as error:
+            messagebox.showerror(
+                "Employee Records",
+                f"Unable to load employee records:\n{error}",
+            )
 
     def search_employee_records(self):
-        search_term = self.search_entry.get().strip()
+        search_text = self.search_entry.get().strip()
 
-        if not search_term:
+        if not search_text:
             self.load_employees()
             return
 
-        employees = search_employees(search_term)
-        self.display_employees(employees)
+        try:
+            employees = search_employees(search_text)
+            self.display_employees(employees)
+        except Exception as error:
+            messagebox.showerror(
+                "Employee Search",
+                f"Unable to search employees:\n{error}",
+            )
 
-    def clear_search(self):
-        self.search_entry.delete(0, "end")
-        self.load_employees()
+    # ---------------------------------------------------------
+    # SELECT EMPLOYEE
+    # ---------------------------------------------------------
+
+    def select_employee(self, employee):
+        self.selected_employee_id = employee["id"]
+
+        self.set_entry_value(
+            "employee_code",
+            employee["employee_code"],
+        )
+        self.set_entry_value(
+            "full_name",
+            employee["full_name"],
+        )
+        self.set_entry_value(
+            "email",
+            employee["email"],
+        )
+        self.set_entry_value(
+            "phone",
+            employee["phone"],
+        )
+        self.set_entry_value(
+            "department",
+            employee["department"],
+        )
+        self.set_entry_value(
+            "designation",
+            employee["designation"],
+        )
+        self.set_entry_value(
+            "salary",
+            employee["salary"],
+        )
+        self.set_entry_value(
+            "joining_date",
+            employee["joining_date"],
+        )
+
+    def set_entry_value(self, key, value):
+        entry = self.entries[key]
+        entry.delete(0, "end")
+        entry.insert(0, str(value))
+
+    # ---------------------------------------------------------
+    # ADD EMPLOYEE
+    # ---------------------------------------------------------
 
     def add_employee(self):
-        employee_code = self.employee_code_entry.get()
-        full_name = self.name_entry.get()
-        email = self.email_entry.get()
-        phone = self.phone_entry.get()
-        department = self.department_entry.get()
-        designation = self.designation_entry.get()
-        salary = self.salary_entry.get()
-        joining_date = self.joining_date_entry.get()
+        employee_code = self.entries["employee_code"].get()
+        full_name = self.entries["full_name"].get()
+        email = self.entries["email"].get()
+        phone = self.entries["phone"].get()
+        department = self.entries["department"].get()
+        designation = self.entries["designation"].get()
+        salary = self.entries["salary"].get()
+        joining_date = self.entries["joining_date"].get()
 
         try:
             create_employee(
@@ -391,36 +519,36 @@ class EmployeeManagementFrame(ctk.CTkFrame):
                 joining_date=joining_date,
             )
 
-        except ValueError as error:
-            self.status_label.configure(
-                text=str(error)
+            messagebox.showinfo(
+                "Success",
+                "Employee added successfully.",
             )
-            return
+
+            self.clear_form()
+            self.load_employees()
+
+        except ValueError as error:
+            messagebox.showwarning(
+                "Validation Error",
+                str(error),
+            )
 
         except Exception as error:
-            self.status_label.configure(
-                text=f"Unable to add employee: {error}"
+            messagebox.showerror(
+                "Employee Creation",
+                f"Unable to add employee:\n{error}",
             )
-            return
 
-        self.status_label.configure(
-            text="Employee added successfully."
-        )
-
-        self.clear_form()
-        self.load_employees()
+    # ---------------------------------------------------------
+    # CLEAR FORM
+    # ---------------------------------------------------------
 
     def clear_form(self):
-        entries = [
-            self.employee_code_entry,
-            self.name_entry,
-            self.email_entry,
-            self.phone_entry,
-            self.department_entry,
-            self.designation_entry,
-            self.salary_entry,
-            self.joining_date_entry,
-        ]
+        self.selected_employee_id = None
 
-        for entry in entries:
+        for entry in self.entries.values():
             entry.delete(0, "end")
+
+        self.form_title.configure(
+            text="Employee Details"
+        )

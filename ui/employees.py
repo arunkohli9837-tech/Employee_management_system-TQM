@@ -5,6 +5,7 @@ from services.employee_service import (
     get_all_employees,
     search_employees,
     create_employee,
+    update_employee,
 )
 
 
@@ -146,6 +147,7 @@ class EmployeeManagementFrame(ctk.CTkFrame):
             text="Update Employee",
             height=38,
             state="disabled",
+            command=self.update_selected_employee,
         )
         self.update_button.grid(
             row=1,
@@ -488,10 +490,72 @@ class EmployeeManagementFrame(ctk.CTkFrame):
             employee["joining_date"],
         )
 
+        self.update_button.configure(state="normal")
+
     def set_entry_value(self, key, value):
         entry = self.entries[key]
         entry.delete(0, "end")
         entry.insert(0, str(value))
+
+    #---------------------------------------------------------
+    #UPDATE EMPLOYEE
+    #---------------------------------------------------------
+    def update_selected_employee(self):
+        if self.selected_employee_id is None:
+            messagebox.showwarning(
+                "No Employee Selected",
+                "Please select an employee before updating.",
+            )
+            return
+
+        employee_code = self.entries["employee_code"].get()
+        full_name = self.entries["full_name"].get()
+        email = self.entries["email"].get()
+        phone = self.entries["phone"].get()
+        department = self.entries["department"].get()
+        designation = self.entries["designation"].get()
+        salary = self.entries["salary"].get()
+        joining_date = self.entries["joining_date"].get()
+
+        try:
+            updated = update_employee(
+                employee_id=self.selected_employee_id,
+                employee_code=employee_code,
+                full_name=full_name,
+                email=email,
+                phone=phone,
+                department=department,
+                designation=designation,
+                salary=salary,
+                joining_date=joining_date,
+            )
+
+            if not updated:
+                messagebox.showwarning(
+                    "Update Employee",
+                    "Employee could not be updated.",
+                )
+                return
+
+            messagebox.showinfo(
+                "Success",
+                "Employee updated successfully.",
+            )
+
+            self.clear_form()
+            self.load_employees()
+
+        except ValueError as error:
+            messagebox.showwarning(
+                "Validation Error",
+                str(error),
+            )
+
+        except Exception as error:
+            messagebox.showerror(
+                "Employee Update",
+                f"Unable to update employee:\n{error}",
+            )
 
     # ---------------------------------------------------------
     # ADD EMPLOYEE
@@ -548,6 +612,10 @@ class EmployeeManagementFrame(ctk.CTkFrame):
 
         for entry in self.entries.values():
             entry.delete(0, "end")
+
+        self.update_button.configure(
+            state="disabled"
+        )
 
         self.form_title.configure(
             text="Employee Details"

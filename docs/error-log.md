@@ -43,3 +43,25 @@ The unused `EmployeeManagementFrame` import was also removed from `ui/dashboard.
 Retested the application after the changes. Login, Employee Management navigation, Back to Dashboard, and Logout worked successfully without the previous exception.
 
 **Status:** Resolved
+
+### Error — Commit 34: Employee Management Deactivation
+
+**Date:** 2026-09-15
+
+**Error:** `ModuleNotFoundError: No module named '_curses'`
+
+**Where:** `ui/employees.py`
+
+**Cause:**  
+An unnecessary `from curses import error` import was present at the beginning of `ui/employees.py`. The Python `curses` module is not available in the Windows environment used for the project.
+
+**Impact:**  
+The application could not start because importing `ui.employees` failed.
+
+**Resolution:**  
+Removed the unnecessary `from curses import error` import. The application already handles exceptions using Python's built-in `Exception` class, so the import was not required.
+
+**Verification:**  
+The `ui/employees.py` file was successfully checked with Python compilation, and the application started successfully afterward. Employee deactivation functionality was then tested successfully.
+
+**Status:** Resolved

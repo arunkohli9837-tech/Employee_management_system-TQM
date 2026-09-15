@@ -6,6 +6,7 @@ from services.employee_service import (
     search_employees,
     create_employee,
     update_employee,
+    deactivate_employee,
 )
 
 
@@ -163,6 +164,7 @@ class EmployeeManagementFrame(ctk.CTkFrame):
             fg_color="#b91c1c",
             hover_color="#991b1b",
             state="disabled",
+            command=self.deactivate_selected_employee,
         )
         self.deactivate_button.grid(
             row=2,
@@ -492,6 +494,11 @@ class EmployeeManagementFrame(ctk.CTkFrame):
 
         self.update_button.configure(state="normal")
 
+        if employee["status"] == "Active":
+            self.deactivate_button.configure(state="normal")
+        else:
+            self.deactivate_button.configure(state="disabled")
+
     def set_entry_value(self, key, value):
         entry = self.entries[key]
         entry.delete(0, "end")
@@ -558,6 +565,52 @@ class EmployeeManagementFrame(ctk.CTkFrame):
             )
 
     # ---------------------------------------------------------
+    # DEACTIVATE EMPLOYEE
+    # ---------------------------------------------------------
+
+    def deactivate_selected_employee(self):
+        if self.selected_employee_id is None:
+            messagebox.showwarning(
+                "No Employee Selected",
+                "Please select an employee before deactivating.",
+            )
+            return
+
+        confirmation = messagebox.askyesno(
+            "Confirm Deactivation",
+            "Are you sure you want to deactivate this employee?",
+        )
+
+        if not confirmation:
+            return
+
+        try:
+            deactivated = deactivate_employee(
+                self.selected_employee_id
+            )
+
+            if not deactivated:
+                messagebox.showwarning(
+                    "Deactivate Employee",
+                    "Employee could not be deactivated.",
+                )
+                return
+
+            messagebox.showinfo(
+                "Success",
+                "Employee deactivated successfully.",
+            )
+
+            self.clear_form()
+            self.load_employees()
+
+        except Exception as error:
+            messagebox.showerror(
+                "Deactivate Employee",
+                f"Unable to deactivate employee:\n{error}",
+            )
+
+    # ---------------------------------------------------------
     # ADD EMPLOYEE
     # ---------------------------------------------------------
 
@@ -614,6 +667,10 @@ class EmployeeManagementFrame(ctk.CTkFrame):
             entry.delete(0, "end")
 
         self.update_button.configure(
+            state="disabled"
+    )
+
+        self.deactivate_button.configure(
             state="disabled"
         )
 

@@ -664,3 +664,44 @@ Connect the Add Employee GUI action with the existing employee creation service 
 - No unexpected error occurred during testing.
 
 **Status:** Completed.
+
+## Commit 34 — Implement Employee Deactivation
+
+**Objective:**  
+Implement employee deactivation through the Employee Management GUI using the existing soft-delete service.
+
+**Work completed:**
+- Connected the Deactivate Employee button with `deactivate_employee()`.
+- Enabled deactivation only when an employee is selected.
+- Added confirmation before deactivation.
+- Implemented soft deactivation so employee records are retained.
+- Inactive employees cannot be deactivated again.
+- Refreshed employee records after successful deactivation.
+- Cleared the selected employee after deactivation.
+- Kept Add and Update functionality working with the existing validation and service layers.
+
+**Issue encountered during implementation:**
+- Application startup initially failed with:
+  `ModuleNotFoundError: No module named '_curses'`.
+
+**Cause:**
+- An unnecessary `from curses import error` import had been added to `ui/employees.py`.
+- The project is running on Windows, where the required `_curses` module was unavailable.
+
+**Fix implemented:**
+- Removed the unnecessary `from curses import error` import.
+- Kept the existing `except Exception as error` handling.
+
+**Testing:**
+- Application started successfully after the fix.
+- Employee selection worked correctly.
+- Deactivate Employee button enabled for active employees.
+- Confirmation dialog worked correctly.
+- Cancel prevented deactivation.
+- Confirming deactivation changed the employee status to Inactive.
+- Employee records refreshed successfully.
+- Inactive employees could not be deactivated again.
+- Add and Update Employee functionality continued to work.
+- No unexpected error remained after the fix.
+
+**Status:** Completed.

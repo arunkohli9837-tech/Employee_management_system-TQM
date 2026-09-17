@@ -4,7 +4,8 @@ from services.session import Session
 from ui.login import LoginFrame
 from ui.dashboard import DashboardFrame
 from ui.employees import EmployeeManagementFrame
-
+from ui.users import UserManagementFrame
+from ui.audit_logs import AuditLogsFrame
 
 class EmployeeManagementApp(ctk.CTk):
     def __init__(self):
@@ -54,6 +55,8 @@ class EmployeeManagementApp(ctk.CTk):
             user=current_user,
             on_logout=self.handle_logout,
             on_employee_management=self.show_employee_management,
+            on_user_management=self.show_user_management,
+            on_audit_logs=self.show_audit_logs,
         )
 
         self.dashboard_frame.pack(
@@ -73,6 +76,38 @@ class EmployeeManagementApp(ctk.CTk):
         )
 
         self.employee_frame.pack(
+            expand=True,
+            fill="both",
+        )
+
+    def show_user_management(self):
+        self.clear_current_frame()
+
+        current_user = self.session.get_current_user()
+
+        self.user_frame = UserManagementFrame(
+            self,
+            user=current_user,
+            on_back=self.show_dashboard,
+        )
+
+        self.user_frame.pack(
+            expand=True,
+            fill="both",
+        )
+
+    def show_audit_logs(self):
+        self.clear_current_frame()
+
+        current_user = self.session.get_current_user()
+
+        self.audit_frame = AuditLogsFrame(
+            self,
+            user=current_user,
+            on_back=self.show_dashboard,
+        )
+
+        self.audit_frame.pack(
             expand=True,
             fill="both",
         )

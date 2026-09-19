@@ -551,21 +551,27 @@ Reliability claims shall be based on implemented and tested functionality rather
 
 ## 11.1 Current Implementation Snapshot
 
-At the current development stage, the following requirements have corresponding implemented functionality:
+At the current development stage, the following requirements have corresponding implemented and tested functionality:
 
 - User authentication and logout
+- Successful and failed authentication audit records
 - Current-user session handling
 - Role-based permission mapping and service-level permission enforcement
 - Employee creation, viewing, searching, updating, and soft deactivation at the service layer
 - Employee input validation for required fields, email, phone, salary, and joining date
 - Joining date validation in `DD-MM-YYYY` format
-- Audit-log creation for successful authentication events
-- Audit-log retrieval and search at the service layer
-- Dashboard and Employee Management GUI navigation
-- Employee viewing and search through the GUI
-- Add Employee operation through the GUI
+- Audit-log creation, retrieval, search, and status filtering
+- Dashboard and fixed-sidebar GUI navigation
+- Employee viewing, search, add, update, and deactivation through the GUI
+- User Management GUI
+- Audit Logs GUI
+- Database backup creation through `services/backup_service.py`
+- Backup listing and SQLite integrity validation
+- Safety backup before restore
+- Database restore with explicit confirmation
+- Backup & Recovery GUI
 
-Features such as User Management GUI, Audit Logs GUI, Backup & Recovery GUI, application-wide error logging/recovery, and the remaining TQM analysis artifacts are planned for later milestones unless a later development log entry records their completion.
+The following remain planned for later milestones: automatic application-lifecycle backup, database-backed backup-history recording, broader application-wide error logging/recovery, and the remaining TQM analysis artifacts. Completion claims will continue to follow the development log and actual testing evidence.
 
 ---
 

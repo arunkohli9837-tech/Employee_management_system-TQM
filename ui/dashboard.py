@@ -15,6 +15,7 @@ class DashboardFrame(ctk.CTkFrame):
         on_employee_management,
         on_user_management,
         on_audit_logs,
+        on_backup_management=None,
     ):
         super().__init__(master)
 
@@ -23,7 +24,7 @@ class DashboardFrame(ctk.CTkFrame):
         self.on_employee_management = on_employee_management
         self.on_user_management = on_user_management
         self.on_audit_logs = on_audit_logs
-
+        self.on_backup_management = on_backup_management
         self.configure(fg_color=("gray95", "gray10"))
 
         self.grid_columnconfigure(1, weight=1)
@@ -31,6 +32,29 @@ class DashboardFrame(ctk.CTkFrame):
 
         self.create_sidebar()
         self.create_content()
+
+    def show_dashboard_content(self):
+        for widget in self.content.winfo_children():
+            widget.destroy()
+
+        self.content.grid_columnconfigure(0, weight=1)
+        self.content.grid_rowconfigure(0, weight=1)
+
+        self.set_active_navigation(self.dashboard_button)
+
+        self.create_dashboard_home()
+
+    def show_feature(self, feature_frame, active_button):
+        for widget in self.content.winfo_children():
+            if widget is not feature_frame:
+                widget.destroy()
+
+        self.set_active_navigation(active_button)
+
+        feature_frame.pack(
+            expand=True,
+            fill="both",
+        )
 
     # =========================================================
     # SIDEBAR
@@ -74,6 +98,13 @@ class DashboardFrame(ctk.CTkFrame):
         # Bottom section
         self.create_profile_section()
 
+    def create_dashboard_home(self):
+        self.content.grid_rowconfigure(4, weight=1)
+
+        self.create_header()
+        self.create_summary_cards()
+        self.create_reliability_section()
+
     def create_navigation_buttons(self):
         self.dashboard_button = self.create_nav_button(
             "▦   Dashboard",
@@ -102,13 +133,33 @@ class DashboardFrame(ctk.CTkFrame):
         if has_permission(self.user, "manage_backups"):
             self.backup_button = self.create_nav_button(
                 "▣   Backups",
-                None,
+                self.on_backup_management,
             )
 
         self.reliability_button = self.create_nav_button(
             "◇   Reliability",
             None,
         )
+
+    def set_active_navigation(self, active_button):
+        buttons = [
+            getattr(self, "dashboard_button", None),
+            getattr(self, "employee_button", None),
+            getattr(self, "user_button", None),
+            getattr(self, "audit_button", None),
+            getattr(self, "backup_button", None),
+            getattr(self, "reliability_button", None),
+        ]
+
+        for button in buttons:
+            if button is not None:
+                button.configure(
+                    fg_color=(
+                        "#2855b8"
+                        if button is active_button
+                        else "transparent"
+                    )
+                )
 
     def create_nav_button(
         self,
@@ -217,13 +268,11 @@ class DashboardFrame(ctk.CTkFrame):
         )
 
         self.content.grid_rowconfigure(
-            4,
+            0,
             weight=1,
         )
 
-        self.create_header()
-        self.create_summary_cards()
-        self.create_reliability_section()
+        self.show_dashboard_content()
 
     # =========================================================
     # HEADER
@@ -594,9 +643,21 @@ class DashboardFrame(ctk.CTkFrame):
             )
 
             status_colors = {
-                "healthy": ("#dcfce7", "#86efac", "#15803d"),
-                "active": ("#eaf2ff", "#bfdbfe", "#2563eb"),
-                "pending": ("#f3e8ff", "#ddd6fe", "#7c3aed"),
+                "healthy": (
+                    "#dcfce7",
+                    "#86efac",
+                    "#15803d",
+                ),
+                "active": (
+                    "#eaf2ff",
+                    "#bfdbfe",
+                    "#2563eb",
+                ),
+                "pending": (
+                    "#f3e8ff",
+                    "#ddd6fe",
+                    "#7c3aed",
+                ),
             }
 
             bg_light, bg_dark, text_color = status_colors[
@@ -651,7 +712,7 @@ class DashboardFrame(ctk.CTkFrame):
     # =========================================================
 
     def show_dashboard_message(self):
-        pass
+        self.show_dashboard_content()
 
     def handle_logout(self):
         self.on_logout()

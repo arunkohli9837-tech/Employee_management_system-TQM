@@ -208,17 +208,7 @@ class AuditLogsFrame(ctk.CTkFrame):
         self.status_label.pack(
             side="left",
         )
-
-        self.back_button = ctk.CTkButton(
-            self.bottom_frame,
-            text="Back to Dashboard",
-            width=160,
-            command=self.on_back,
-        )
-        self.back_button.pack(
-            side="right",
-        )
-
+        
     # =========================================================
     # DATA
     # =========================================================

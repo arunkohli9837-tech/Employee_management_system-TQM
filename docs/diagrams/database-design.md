@@ -17,7 +17,7 @@ The database is accessed from Python through the `sqlite3` library and is kept s
 | Database Type | Local relational database |
 | Primary Usage | Employee and system data storage |
 | Integrity | Primary keys, foreign keys, UNIQUE, NOT NULL, CHECK constraints, and transactions |
-| Backup | Database backup/recovery mechanisms planned for later implementation |
+| Backup | File-based backup/recovery service implemented; backup history table reserved for operation records |
 
 ---
 
@@ -161,7 +161,7 @@ The `backup_history` table is defined for recording backup and restore operation
 | created_at | TEXT | NOT NULL, timestamp |
 | description | TEXT | Additional operation information |
 
-Backup and recovery service/GUI functionality is planned for a later milestone.
+Backup and recovery service and GUI functionality are implemented. The current implementation stores backup files in the `backups/` directory and validates SQLite integrity before restore. The `backup_history` table is defined for future database-backed recording of backup/restore metadata.
 
 ---
 

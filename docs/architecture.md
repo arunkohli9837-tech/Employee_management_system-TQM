@@ -36,7 +36,10 @@ Employee Management System
 ├── ui/
 │   ├── login.py
 │   ├── dashboard.py
-│   └── employees.py
+│   ├── employees.py
+│   ├── users.py
+│   ├── audit_logs.py
+│   └── backup.py
 │
 ├── services/
 │   ├── auth_service.py
@@ -45,7 +48,8 @@ Employee Management System
 │   ├── validation_service.py
 │   ├── employee_service.py
 │   ├── user_service.py
-│   └── audit_service.py
+│   ├── audit_service.py
+│   └── backup_service.py
 │
 ├── database/
 │   ├── database.py
@@ -73,26 +77,26 @@ The exact project contents may grow as later milestones are implemented.
 +-----------------------------------------------------------+
 |                  PRESENTATION LAYER                      |
 |                   CustomTkinter GUI                      |
-|                                                           |
-| Login → Dashboard → Employee Management                  |
-|                                                           |
-| Planned: Users | Audit Logs | Backup & Recovery          |
+|                                                          |
+| Login → Dashboard → Feature screens                      |
+|                                                          |
+| Users | Audit Logs | Backup & Recovery                   |
 +------------------------------+----------------------------+
                                |
                                v
 +-----------------------------------------------------------+
 |              SERVICE / BUSINESS LOGIC LAYER              |
-|                                                           |
+|                                                          |
 | Authentication | Session | Authorization | Validation    |
 | Employee Operations | User Operations | Audit Operations |
-| Planned: Backup / Recovery Operations                    |
+| Backup / Recovery Operations                             |
 +------------------------------+----------------------------+
                                |
                                v
 +-----------------------------------------------------------+
 |                    DATABASE LAYER                        |
-|                                                           |
-| database.py | SQLite / sqlite3 | Schema Initialization     |
+|                                                          |
+| database.py | SQLite / sqlite3 | Schema Initialization   |
 | Queries | Parameterized SQL | Transactions | Constraints |
 +------------------------------+----------------------------+
                                |
@@ -100,7 +104,7 @@ The exact project contents may grow as later milestones are implemented.
 +-----------------------------------------------------------+
 |                     SQLite DATABASE                      |
 | Users | Employees | Audit Logs | Error Logs              |
-| Backup History                                             |
+| Backup History                                           |
 +-----------------------------------------------------------+
 ```
 
@@ -133,7 +137,7 @@ The service layer is responsible for:
 - Audit logging and audit retrieval/search.
 - Transaction commit/rollback handling in implemented database operations.
 
-Planned backup/recovery services will be added when that milestone is implemented.
+Backup and recovery operations are implemented through `services/backup_service.py` and exposed through the Backup & Recovery GUI.
 
 ### 5.3 Database Layer
 
@@ -159,13 +163,13 @@ LoginFrame
 EmployeeManagementApp
     ↓
 DashboardFrame
-    ↓ Employee Management callback
-EmployeeManagementFrame
-    ↓ Back callback
-EmployeeManagementApp
-    ↓
-DashboardFrame
+    ├── Employee Management
+    ├── User Management
+    ├── Audit Logs
+    └── Backup & Recovery
 ```
+
+Top-level navigation is coordinated by `main.py`, while the Dashboard keeps the sidebar fixed and displays the selected feature in the content area. The feature screens no longer require a visible Back to Dashboard button because the fixed sidebar provides navigation.
 
 This avoids making individual GUI frames responsible for recreating other top-level screens.
 
@@ -182,6 +186,7 @@ Reliability is supported through multiple layers:
 - Transaction commit/rollback handling in implemented write operations.
 - Soft deactivation instead of permanent deletion for employees and users.
 - Audit logging for implemented auditable operations.
+- Backup creation, SQLite integrity validation, safety backup before restore, and restore recovery handling.
 
 Security is supported through:
 
@@ -199,9 +204,8 @@ Backup/recovery and broader application error logging are planned reliability mi
 
 The architecture will remain layered as new features are added. Future milestones are expected to extend the existing structure rather than introduce unnecessary technologies.
 
-Planned additions include:
+Remaining planned additions include:
 
-- Additional GUI screens for User Management, Audit Logs, and Backup & Recovery.
 - Stronger centralized error handling and recovery.
 - Application-level error logging.
 - TQM reliability analysis documentation based on actual project data.

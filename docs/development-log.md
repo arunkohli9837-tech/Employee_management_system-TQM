@@ -665,6 +665,63 @@ Connect the Add Employee GUI action with the existing employee creation service 
 
 **Status:** Completed.
 
+----
+
+## Commit 32 — Implement Employee Selection and Details View
+
+**Objective:**  
+Allow the user to select an employee record from the Employee Management screen and view its complete details.
+
+**Work completed:**
+- Added employee record selection functionality to the Employee Management GUI.
+- Connected the selected record with the existing employee data.
+- Added an employee details section for displaying the selected employee information.
+- Displayed employee code, full name, email, phone, department, designation, salary, joining date, and status.
+- Added handling for cases where no employee is selected.
+- Kept the existing employee listing and search functionality intact.
+- Maintained separation between the GUI and employee service layer.
+
+**Testing:**
+- Employee Management screen opened successfully.
+- Employee records were displayed successfully.
+- Employee selection worked successfully.
+- Selected employee details were displayed correctly.
+- Existing employee search functionality continued to work.
+- Back to Dashboard navigation continued to work correctly.
+- No unexpected error occurred during testing.
+
+**Status:** Completed.
+
+---
+
+## Commit 33 — Implement Employee Update GUI
+
+**Objective:**  
+Connect the Update Employee functionality in the GUI with the existing employee update service.
+
+**Work completed:**
+- Connected the Update Employee action with `update_employee()` from `employee_service.py`.
+- Used the selected employee record to populate the employee form.
+- Allowed existing employee information to be edited through the GUI.
+- Reused the existing employee validation service before database update.
+- Added feedback for successful employee updates.
+- Refreshed the employee records after a successful update.
+- Preserved the existing employee management, search, and selection functionality.
+- Maintained separation between the GUI, service, validation, and database layers.
+
+**Testing:**
+- Employee Management screen opened successfully.
+- Existing employee could be selected successfully.
+- Selected employee information was loaded into the form.
+- Employee information could be updated successfully.
+- Updated employee information was reflected in the employee records.
+- Existing validation remained functional.
+- No unexpected error occurred during testing.
+
+**Status:** Completed.
+
+---
+
 ## Commit 34 — Implement Employee Deactivation
 
 **Objective:**  
@@ -705,3 +762,120 @@ Implement employee deactivation through the Employee Management GUI using the ex
 - No unexpected error remained after the fix.
 
 **Status:** Completed.
+
+---
+## Commit 35 — Implement User Management and Audit Logs GUI
+
+**Objective:**  
+Build the graphical interfaces for User Management and Audit Logs and connect them with the existing service-layer functionality.
+
+**Work completed:**
+
+### User Management
+- Added the User Management GUI.
+- Added display of existing system users.
+- Displayed username, role, and account status.
+- Added user activation functionality.
+- Added user deactivation functionality.
+- Connected the GUI with the existing `user_service.py`.
+- Preserved role-based access restrictions for User Management.
+- Added navigation back to the Dashboard.
+
+### Audit Logs
+- Added `ui/audit_logs.py`.
+- Added the Audit Logs GUI.
+- Added display of audit records including:
+  - ID
+  - Username
+  - Action
+  - Target
+  - Status
+  - Date
+  - Time
+  - Description
+- Added audit log search functionality.
+- Added status filtering for All, Success, and Failed records.
+- Added Search functionality.
+- Added Refresh functionality.
+- Added a message when no matching audit records are available.
+- Connected the GUI with the existing `audit_service.py`.
+- Added navigation back to the Dashboard.
+
+### Main Application Navigation
+- Updated `main.py` to open User Management from the Dashboard.
+- Updated `main.py` to open Audit Logs from the Dashboard.
+- Updated Dashboard navigation callbacks for the newly implemented screens.
+- Preserved the existing authentication and RBAC flow.
+
+**Testing:**
+- User Management screen opened successfully.
+- Existing users were displayed successfully.
+- User Management functionality was tested successfully.
+- Audit Logs screen opened successfully.
+- Existing audit records were displayed successfully.
+- Audit log search functionality was tested successfully.
+- Audit log status filtering was tested successfully.
+- Refresh functionality worked successfully.
+- Back to Dashboard navigation worked successfully.
+- No unexpected error occurred during testing.
+
+**Status:** Completed.
+
+---
+## Commit 36 — Implement Fixed Sidebar Navigation and Backup & Recovery
+
+### Objective
+Improve application navigation and reliability by implementing fixed sidebar navigation and a functional database backup and recovery system.
+
+### Changes Implemented
+
+#### Fixed Sidebar Navigation
+- Implemented fixed sidebar navigation for the dashboard.
+- Feature screens now open in the main content area without removing the sidebar.
+- Added active-state highlighting for the currently selected sidebar feature.
+- Dashboard button becomes active when returning to the dashboard.
+- Removed the visible "Back to Dashboard" button from Employee Management because the fixed sidebar provides navigation.
+- Connected Employee Management, User Management, Audit Logs, and Backup navigation through the dashboard sidebar.
+
+#### Audit Logging
+- Added failed authentication audit logging.
+- Failed login attempts are recorded for:
+  - Unknown username
+  - Inactive account
+  - Invalid password
+- Successful login operations continue to be recorded as successful audit events.
+- Audit Logs can display failed operations through the existing status filtering.
+
+#### Backup & Recovery
+- Added `services/backup_service.py`.
+- Implemented timestamped database backup creation.
+- Added backup directory management.
+- Added backup listing.
+- Added SQLite integrity validation for backup files.
+- Added safety backup creation before database restoration.
+- Implemented database restore functionality.
+- Added Backup & Recovery GUI.
+- Added backup creation, refresh, backup selection, validation, and restore controls.
+- Added restore confirmation before replacing the current database.
+- Added recovery handling if the restore operation fails.
+
+### Testing
+- Tested fixed sidebar navigation successfully.
+- Tested active sidebar button highlighting.
+- Tested Employee Management without the visible Back to Dashboard button.
+- Tested successful and failed authentication audit logging.
+- Tested backup creation successfully.
+- Tested backup listing successfully.
+- Tested backup validation successfully.
+- Tested database restore successfully.
+- Tested safety backup creation before restore.
+- No unexpected error was reported during Commit 38 testing.
+
+### Error Handling
+During development, an actual Tkinter error was encountered while implementing the fixed sidebar:
+
+`_tkinter.TclError: bad window path name`
+
+The issue occurred because the active feature frame was destroyed before it was packed into the content area. The navigation logic was corrected so that the active feature frame is preserved.
+
+The error has been recorded separately in `docs/error-log.md`.

@@ -84,15 +84,45 @@ def authenticate_user(username: str, password: str):
             (username,),
         ).fetchone()
 
+        # Username does not exist
         if user is None:
+            create_audit_log(
+                user_id=None,
+                username=username,
+                action="LOGIN",
+                target_type="User",
+                target_id=None,
+                description="Login failed: user not found",
+                status="Failed",
+            )
             return None
 
         user_id, stored_username, stored_hash, role, is_active = user
 
+        # User account is inactive
         if not is_active:
+            create_audit_log(
+                user_id=user_id,
+                username=stored_username,
+                action="LOGIN",
+                target_type="User",
+                target_id=user_id,
+                description="Login failed: account is inactive",
+                status="Failed",
+            )
             return None
 
+        # Password is incorrect
         if not verify_password(password, stored_hash):
+            create_audit_log(
+                user_id=user_id,
+                username=stored_username,
+                action="LOGIN",
+                target_type="User",
+                target_id=user_id,
+                description="Login failed: invalid password",
+                status="Failed",
+            )
             return None
 
         user = {

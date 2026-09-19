@@ -58,18 +58,6 @@ class EmployeeManagementFrame(ctk.CTkFrame):
             sticky="w",
         )
 
-        self.back_button = ctk.CTkButton(
-            self.header,
-            text="Back to Dashboard",
-            width=150,
-            command=self.on_back,
-        )
-        self.back_button.grid(
-            row=0,
-            column=1,
-            padx=(10, 0),
-        )
-
     # ---------------------------------------------------------
     # LEFT FORM
     # ---------------------------------------------------------

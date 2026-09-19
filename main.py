@@ -6,6 +6,7 @@ from ui.dashboard import DashboardFrame
 from ui.employees import EmployeeManagementFrame
 from ui.users import UserManagementFrame
 from ui.audit_logs import AuditLogsFrame
+from ui.backup import BackupManagementFrame
 
 class EmployeeManagementApp(ctk.CTk):
     def __init__(self):
@@ -46,9 +47,13 @@ class EmployeeManagementApp(ctk.CTk):
         self.show_dashboard(current_user)
 
     def show_dashboard(self, user=None):
-        self.clear_current_frame()
-
         current_user = user or self.session.get_current_user()
+
+        if hasattr(self, "dashboard_frame") and self.dashboard_frame.winfo_exists():
+            self.dashboard_frame.show_dashboard_content()
+            return
+
+        self.clear_current_frame()
 
         self.dashboard_frame = DashboardFrame(
             self,
@@ -57,6 +62,7 @@ class EmployeeManagementApp(ctk.CTk):
             on_employee_management=self.show_employee_management,
             on_user_management=self.show_user_management,
             on_audit_logs=self.show_audit_logs,
+            on_backup_management=self.show_backup_management,
         )
 
         self.dashboard_frame.pack(
@@ -65,51 +71,59 @@ class EmployeeManagementApp(ctk.CTk):
         )
 
     def show_employee_management(self):
-        self.clear_current_frame()
-
         current_user = self.session.get_current_user()
 
         self.employee_frame = EmployeeManagementFrame(
-            self,
+            self.dashboard_frame.content,
             user=current_user,
             on_back=self.show_dashboard,
         )
 
-        self.employee_frame.pack(
-            expand=True,
-            fill="both",
+        self.dashboard_frame.show_feature(
+            self.employee_frame,
+            self.dashboard_frame.employee_button,
         )
 
     def show_user_management(self):
-        self.clear_current_frame()
-
         current_user = self.session.get_current_user()
 
         self.user_frame = UserManagementFrame(
-            self,
+            self.dashboard_frame.content,
             user=current_user,
             on_back=self.show_dashboard,
         )
 
-        self.user_frame.pack(
-            expand=True,
-            fill="both",
+        self.dashboard_frame.show_feature(
+            self.user_frame,
+            self.dashboard_frame.user_button,
         )
 
     def show_audit_logs(self):
-        self.clear_current_frame()
-
         current_user = self.session.get_current_user()
 
-        self.audit_frame = AuditLogsFrame(
-            self,
+        self.audit_logs_frame = AuditLogsFrame(
+            self.dashboard_frame.content,
             user=current_user,
             on_back=self.show_dashboard,
         )
 
-        self.audit_frame.pack(
-            expand=True,
-            fill="both",
+        self.dashboard_frame.show_feature(
+            self.audit_logs_frame,
+            self.dashboard_frame.audit_button,
+        )
+
+    def show_backup_management(self):
+        current_user = self.session.get_current_user()
+
+        self.backup_frame = BackupManagementFrame(
+            self.dashboard_frame.content,
+            user=current_user,
+            on_back=self.show_dashboard,
+       )
+
+        self.dashboard_frame.show_feature(
+            self.backup_frame,
+            self.dashboard_frame.backup_button,
         )
 
     def handle_logout(self):

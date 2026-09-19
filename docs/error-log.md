@@ -65,3 +65,26 @@ Removed the unnecessary `from curses import error` import. The application alrea
 The `ui/employees.py` file was successfully checked with Python compilation, and the application started successfully afterward. Employee deactivation functionality was then tested successfully.
 
 **Status:** Resolved
+
+### Error — Commit 37: Fixed Sidebar Feature Navigation
+
+**Date:** 2026-09-19
+
+**Error:** `_tkinter.TclError: bad window path name`
+
+**Where:** `ui/dashboard.py` inside the `show_feature()` navigation method.
+
+**Cause:**  
+The feature frame had already been created as a child of the Dashboard content area. The `show_feature()` method destroyed all widgets in that content area before calling `.pack()` on the feature frame, which destroyed the frame itself.
+
+**Impact:**  
+Opening Employee Management, User Management, or Audit Logs could raise a Tkinter exception and prevent the selected feature from being displayed.
+
+**Resolution:**  
+Changed `show_feature()` so that it destroys only other content widgets and preserves the feature frame passed to it before packing the frame.
+
+**Verification:**  
+Retested feature navigation. The sidebar remained visible, feature content opened correctly, and the selected sidebar button was highlighted. No unexpected error remained after the fix.
+
+**Status:** Resolved
+

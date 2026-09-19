@@ -4,6 +4,7 @@ from services.access_control import has_permission
 from services.employee_service import get_all_employees
 from services.user_service import get_all_users
 from services.audit_service import get_all_audit_logs
+from services.backup_service import list_backups
 
 
 class DashboardFrame(ctk.CTkFrame):
@@ -25,6 +26,7 @@ class DashboardFrame(ctk.CTkFrame):
         self.on_user_management = on_user_management
         self.on_audit_logs = on_audit_logs
         self.on_backup_management = on_backup_management
+
         self.configure(fg_color=("gray95", "gray10"))
 
         self.grid_columnconfigure(1, weight=1)
@@ -76,7 +78,6 @@ class DashboardFrame(ctk.CTkFrame):
 
         self.sidebar.grid_propagate(False)
 
-        # Application title
         self.logo_label = ctk.CTkLabel(
             self.sidebar,
             text="Employee\nManagement System",
@@ -92,10 +93,7 @@ class DashboardFrame(ctk.CTkFrame):
             pady=(38, 35),
         )
 
-        # Navigation buttons
         self.create_navigation_buttons()
-
-        # Bottom section
         self.create_profile_section()
 
     def create_dashboard_home(self):
@@ -530,6 +528,10 @@ class DashboardFrame(ctk.CTkFrame):
             weight=1,
         )
 
+        automatic_backup_status, automatic_backup_type = (
+            self.get_automatic_backup_status()
+        )
+
         reliability_items = [
             (
                 "Database Status",
@@ -557,9 +559,9 @@ class DashboardFrame(ctk.CTkFrame):
             ),
             (
                 "Automatic Backup",
-                "Backup and recovery feature",
-                "Pending",
-                "pending",
+                "Latest automatic backup status",
+                automatic_backup_status,
+                automatic_backup_type,
             ),
         ]
 
@@ -706,6 +708,24 @@ class DashboardFrame(ctk.CTkFrame):
             return len(get_all_audit_logs())
         except Exception:
             return 0
+
+    def get_automatic_backup_status(self):
+        try:
+            backups = list_backups()
+
+            automatic_backups = [
+                backup
+                for backup in backups
+                if "_auto_" in backup.name
+            ]
+
+            if automatic_backups:
+                return "Active", "healthy"
+
+            return "Pending", "pending"
+
+        except Exception:
+            return "Unavailable", "pending"
 
     # =========================================================
     # ACTIONS

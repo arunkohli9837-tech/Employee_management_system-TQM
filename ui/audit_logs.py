@@ -174,7 +174,10 @@ class AuditLogsFrame(ctk.CTkFrame):
         self.log_textbox = ctk.CTkTextbox(
             self.table_frame,
             wrap="none",
-            font=ctk.CTkFont(size=13),
+            font=ctk.CTkFont(
+                family="Consolas",
+                size=13,
+            ),
         )
         self.log_textbox.grid(
             row=0,
@@ -208,7 +211,7 @@ class AuditLogsFrame(ctk.CTkFrame):
         self.status_label.pack(
             side="left",
         )
-        
+
     # =========================================================
     # DATA
     # =========================================================
@@ -305,17 +308,18 @@ class AuditLogsFrame(ctk.CTkFrame):
 
             return
 
+        # Fixed-width columns for proper alignment.
         header = (
             f"{'ID':<6}"
-            f"{'Username':<18}"
-            f"{'Action':<25}"
-            f"{'Target':<20}"
-            f"{'Status':<12}"
+            f"{'Username':<16}"
+            f"{'Action':<22}"
+            f"{'Target':<18}"
+            f"{'Status':<10}"
             f"{'Date / Time':<22}"
             f"Description\n"
         )
 
-        separator = "-" * 150 + "\n"
+        separator = "-" * 125 + "\n"
 
         self.log_textbox.insert(
             "end",
@@ -342,14 +346,40 @@ class AuditLogsFrame(ctk.CTkFrame):
             else:
                 target = str(target_id)
 
+            username = str(
+                log.get("username", "")
+            )[:15]
+
+            action = str(
+                log.get("action", "")
+            )[:21]
+
+            target = target[:17]
+
+            status = str(
+                log.get("status", "")
+            )[:9]
+
+            created_at = str(
+                log.get("created_at", "")
+            )[:21]
+
+            description = str(
+                log.get("description", "")
+            )
+
+            line = (
+                f"{username:<16}"
+                f"{action:<22}"
+            )
+
             line = (
                 f"{str(log.get('id', '')):<6}"
-                f"{str(log.get('username', ''))[:17]:<18}"
-                f"{str(log.get('action', ''))[:24]:<25}"
-                f"{target[:19]:<20}"
-                f"{str(log.get('status', '')):<12}"
-                f"{str(log.get('created_at', '')):<22}"
-                f"{str(log.get('description', ''))}\n"
+                f"{line}"
+                f"{target:<18}"
+                f"{status:<10}"
+                f"{created_at:<22}"
+                f"{description}\n"
             )
 
             self.log_textbox.insert(

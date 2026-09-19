@@ -2,6 +2,7 @@ import customtkinter as ctk
 
 from services.session import Session
 from services.error_handler import handle_exception
+from services.backup_service import create_automatic_backup
 
 from ui.login import LoginFrame
 from ui.dashboard import DashboardFrame
@@ -133,12 +134,25 @@ class EmployeeManagementApp(ctk.CTk):
         )
 
     def handle_logout(self):
+        try:
+            create_automatic_backup()
+
+        except Exception as error:
+            message = handle_exception(
+                "Automatic logout backup",
+                error,
+            )
+            print(message)
+
         self.session.logout()
         self.show_login()
 
 
 def main():
     try:
+        # Create an automatic database backup before starting the application.
+        create_automatic_backup()
+
         app = EmployeeManagementApp()
         app.mainloop()
 

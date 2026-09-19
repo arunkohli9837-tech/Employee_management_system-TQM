@@ -5,7 +5,9 @@ from services.user_service import (
     get_all_users,
     activate_user,
     deactivate_user,
+    update_user,
 )
+from services.auth_service import create_user
 
 
 class UserManagementFrame(ctk.CTkFrame):
@@ -121,7 +123,10 @@ class UserManagementFrame(ctk.CTkFrame):
             weight=1,
         )
 
+        # -----------------------------------------------------
         # Username
+        # -----------------------------------------------------
+
         self.username_label = ctk.CTkLabel(
             self.account_scroll,
             text="Username",
@@ -153,7 +158,10 @@ class UserManagementFrame(ctk.CTkFrame):
             pady=(0, 12),
         )
 
+        # -----------------------------------------------------
         # Role
+        # -----------------------------------------------------
+
         self.role_label = ctk.CTkLabel(
             self.account_scroll,
             text="User Role",
@@ -185,7 +193,46 @@ class UserManagementFrame(ctk.CTkFrame):
             pady=(0, 12),
         )
 
+        # -----------------------------------------------------
+        # Password
+        # -----------------------------------------------------
+
+        self.password_label = ctk.CTkLabel(
+            self.account_scroll,
+            text="Password",
+            font=ctk.CTkFont(
+                size=14,
+                weight="bold",
+            ),
+            anchor="w",
+        )
+
+        self.password_label.grid(
+            row=4,
+            column=0,
+            sticky="w",
+            padx=15,
+            pady=(5, 5),
+        )
+
+        self.password_entry = ctk.CTkEntry(
+            self.account_scroll,
+            height=38,
+            show="*",
+        )
+
+        self.password_entry.grid(
+            row=5,
+            column=0,
+            sticky="ew",
+            padx=15,
+            pady=(0, 12),
+        )
+
+        # -----------------------------------------------------
         # Status
+        # -----------------------------------------------------
+
         self.status_label = ctk.CTkLabel(
             self.account_scroll,
             text="Account Status",
@@ -197,7 +244,7 @@ class UserManagementFrame(ctk.CTkFrame):
         )
 
         self.status_label.grid(
-            row=4,
+            row=6,
             column=0,
             sticky="w",
             padx=15,
@@ -210,19 +257,22 @@ class UserManagementFrame(ctk.CTkFrame):
         )
 
         self.status_entry.grid(
-            row=5,
+            row=7,
             column=0,
             sticky="ew",
             padx=15,
             pady=(0, 20),
         )
 
+        # -----------------------------------------------------
         # Information
+        # -----------------------------------------------------
+
         self.info_label = ctk.CTkLabel(
             self.account_scroll,
             text=(
                 "Select a user from the records panel "
-                "to manage the account status."
+                "to manage the account."
             ),
             font=ctk.CTkFont(size=13),
             text_color=("gray45", "gray65"),
@@ -232,14 +282,17 @@ class UserManagementFrame(ctk.CTkFrame):
         )
 
         self.info_label.grid(
-            row=6,
+            row=8,
             column=0,
             sticky="w",
             padx=15,
             pady=(5, 20),
         )
 
-        # Action buttons
+        # =====================================================
+        # ACTION BUTTONS
+        # =====================================================
+
         self.action_frame = ctk.CTkFrame(
             self.account_panel,
             fg_color="transparent",
@@ -258,6 +311,38 @@ class UserManagementFrame(ctk.CTkFrame):
             weight=1,
         )
 
+        # Add User
+        self.add_button = ctk.CTkButton(
+            self.action_frame,
+            text="Add User",
+            height=40,
+            command=self.add_user,
+        )
+
+        self.add_button.grid(
+            row=0,
+            column=0,
+            sticky="ew",
+            pady=(0, 8),
+        )
+
+        # Update User
+        self.update_button = ctk.CTkButton(
+            self.action_frame,
+            text="Update User",
+            height=40,
+            state="disabled",
+            command=self.update_selected_user,
+        )
+
+        self.update_button.grid(
+            row=1,
+            column=0,
+            sticky="ew",
+            pady=4,
+        )
+
+        # Activate User
         self.activate_button = ctk.CTkButton(
             self.action_frame,
             text="Activate User",
@@ -267,12 +352,13 @@ class UserManagementFrame(ctk.CTkFrame):
         )
 
         self.activate_button.grid(
-            row=0,
+            row=2,
             column=0,
             sticky="ew",
-            pady=(0, 8),
+            pady=4,
         )
 
+        # Deactivate User
         self.deactivate_button = ctk.CTkButton(
             self.action_frame,
             text="Deactivate User",
@@ -284,12 +370,13 @@ class UserManagementFrame(ctk.CTkFrame):
         )
 
         self.deactivate_button.grid(
-            row=1,
+            row=3,
             column=0,
             sticky="ew",
             pady=4,
         )
 
+        # Clear Selection
         self.clear_button = ctk.CTkButton(
             self.action_frame,
             text="Clear Selection",
@@ -300,7 +387,7 @@ class UserManagementFrame(ctk.CTkFrame):
         )
 
         self.clear_button.grid(
-            row=2,
+            row=4,
             column=0,
             sticky="ew",
             pady=(8, 0),
@@ -327,7 +414,7 @@ class UserManagementFrame(ctk.CTkFrame):
         )
 
         self.records_panel.grid_rowconfigure(
-            1,
+            2,
             weight=1,
         )
 
@@ -418,11 +505,6 @@ class UserManagementFrame(ctk.CTkFrame):
             sticky="nsew",
             padx=20,
             pady=(0, 20),
-        )
-
-        self.records_panel.grid_rowconfigure(
-            2,
-            weight=1,
         )
 
         self.records_scroll.grid_columnconfigure(
@@ -657,12 +739,18 @@ class UserManagementFrame(ctk.CTkFrame):
             status,
         )
 
+        self.password_entry.delete(0, "end")
+
         self.info_label.configure(
             text=(
                 f"Selected User: {user['username']}\n"
                 f"Role: {user['role']}\n"
                 f"Account status: {status}"
             ),
+        )
+
+        self.update_button.configure(
+            state="normal",
         )
 
         if user["is_active"]:
@@ -684,6 +772,95 @@ class UserManagementFrame(ctk.CTkFrame):
             )
 
     # =========================================================
+    # ADD USER
+    # =========================================================
+
+    def add_user(self):
+        username = self.username_entry.get().strip()
+        role = self.role_entry.get().strip()
+        password = self.password_entry.get()
+
+        try:
+            create_user(
+                username=username,
+                password=password,
+                role=role,
+                performed_by=self.user,
+            )
+
+            messagebox.showinfo(
+                "Success",
+                "User created successfully.",
+            )
+
+            self.clear_selection()
+            self.load_users()
+
+        except ValueError as error:
+            messagebox.showwarning(
+                "Validation Error",
+                str(error),
+            )
+
+        except Exception as error:
+            messagebox.showerror(
+                "User Creation",
+                f"Unable to create user:\n{error}",
+            )
+
+    # =========================================================
+    # UPDATE USER
+    # =========================================================
+
+    def update_selected_user(self):
+        if self.selected_user_id is None:
+            messagebox.showwarning(
+                "No User Selected",
+                "Please select a user before updating.",
+            )
+            return
+
+        username = self.username_entry.get().strip()
+        role = self.role_entry.get().strip()
+        password = self.password_entry.get()
+
+        try:
+            updated = update_user(
+                user_id=self.selected_user_id,
+                username=username,
+                role=role,
+                password=password,
+                performed_by=self.user,
+            )
+
+            if not updated:
+                messagebox.showwarning(
+                    "Update User",
+                    "User could not be updated.",
+                )
+                return
+
+            messagebox.showinfo(
+                "Success",
+                "User updated successfully.",
+            )
+
+            self.clear_selection()
+            self.load_users()
+
+        except ValueError as error:
+            messagebox.showwarning(
+                "Validation Error",
+                str(error),
+            )
+
+        except Exception as error:
+            messagebox.showerror(
+                "User Update",
+                f"Unable to update user:\n{error}",
+            )
+
+    # =========================================================
     # ACTIVATE USER
     # =========================================================
 
@@ -702,6 +879,7 @@ class UserManagementFrame(ctk.CTkFrame):
         try:
             activated = activate_user(
                 self.selected_user_id,
+                performed_by=self.user,
             )
 
             if not activated:
@@ -750,6 +928,7 @@ class UserManagementFrame(ctk.CTkFrame):
         try:
             deactivated = deactivate_user(
                 self.selected_user_id,
+                performed_by=self.user,
             )
 
             if not deactivated:
@@ -785,13 +964,14 @@ class UserManagementFrame(ctk.CTkFrame):
         self.info_label.configure(
             text=(
                 "Select a user from the records panel "
-                "to manage the account status."
+                "to manage the account."
             ),
         )
 
     def clear_account_fields(self):
         self.username_entry.delete(0, "end")
         self.role_entry.delete(0, "end")
+        self.password_entry.delete(0, "end")
         self.status_entry.delete(0, "end")
 
     def set_field_value(self, entry, value):
@@ -799,6 +979,10 @@ class UserManagementFrame(ctk.CTkFrame):
         entry.insert(0, str(value))
 
     def set_action_buttons_disabled(self):
+        self.update_button.configure(
+            state="disabled",
+        )
+
         self.activate_button.configure(
             state="disabled",
         )

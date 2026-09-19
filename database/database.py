@@ -1,5 +1,6 @@
 from pathlib import Path
 import sqlite3
+from contextlib import contextmanager
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,6 +21,26 @@ def get_connection() -> sqlite3.Connection:
     connection.execute("PRAGMA foreign_keys = ON")
 
     return connection
+
+
+@contextmanager
+def transaction():
+    """
+    Provide a database transaction with automatic
+    commit and rollback handling.
+    """
+    connection = get_connection()
+
+    try:
+        yield connection
+        connection.commit()
+
+    except Exception:
+        connection.rollback()
+        raise
+
+    finally:
+        connection.close()
 
 
 def initialize_database() -> None:

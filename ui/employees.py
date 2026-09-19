@@ -492,9 +492,10 @@ class EmployeeManagementFrame(ctk.CTkFrame):
         entry.delete(0, "end")
         entry.insert(0, str(value))
 
-    #---------------------------------------------------------
-    #UPDATE EMPLOYEE
-    #---------------------------------------------------------
+    # ---------------------------------------------------------
+    # UPDATE EMPLOYEE
+    # ---------------------------------------------------------
+
     def update_selected_employee(self):
         if self.selected_employee_id is None:
             messagebox.showwarning(
@@ -523,6 +524,7 @@ class EmployeeManagementFrame(ctk.CTkFrame):
                 designation=designation,
                 salary=salary,
                 joining_date=joining_date,
+                performed_by=self.user,
             )
 
             if not updated:
@@ -574,7 +576,8 @@ class EmployeeManagementFrame(ctk.CTkFrame):
 
         try:
             deactivated = deactivate_employee(
-                self.selected_employee_id
+                self.selected_employee_id,
+                performed_by=self.user,
             )
 
             if not deactivated:
@@ -622,6 +625,7 @@ class EmployeeManagementFrame(ctk.CTkFrame):
                 designation=designation,
                 salary=salary,
                 joining_date=joining_date,
+                performed_by=self.user,
             )
 
             messagebox.showinfo(
@@ -656,7 +660,7 @@ class EmployeeManagementFrame(ctk.CTkFrame):
 
         self.update_button.configure(
             state="disabled"
-    )
+        )
 
         self.deactivate_button.configure(
             state="disabled"

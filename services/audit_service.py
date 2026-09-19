@@ -1,4 +1,46 @@
-from database.database import get_connection
+from database.database import get_connection, transaction
+
+
+def insert_audit_log(
+    connection,
+    user_id,
+    username,
+    action,
+    target_type,
+    target_id=None,
+    description="",
+    status="Success",
+):
+    """
+    Insert an audit log using an existing database connection.
+
+    The caller controls the transaction. This allows the audit
+    record to be committed or rolled back together with the
+    main database operation.
+    """
+    connection.execute(
+        """
+        INSERT INTO audit_logs (
+            user_id,
+            username,
+            action,
+            target_type,
+            target_id,
+            description,
+            status
+        )
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+        """,
+        (
+            user_id,
+            username,
+            action,
+            target_type,
+            target_id,
+            description,
+            status,
+        ),
+    )
 
 
 def create_audit_log(
@@ -10,46 +52,26 @@ def create_audit_log(
     description="",
     status="Success",
 ):
-    """Create an audit log entry for a system action."""
+    """
+    Create an audit log as an independent transaction.
 
-    connection = get_connection()
-
-    try:
-        connection.execute(
-            """
-            INSERT INTO audit_logs (
-                user_id,
-                username,
-                action,
-                target_type,
-                target_id,
-                description,
-                status
-            )
-            VALUES (?, ?, ?, ?, ?, ?, ?)
-            """,
-            (
-                user_id,
-                username,
-                action,
-                target_type,
-                target_id,
-                description,
-                status,
-            ),
+    This function is used by operations such as authentication
+    where there is no existing business transaction.
+    """
+    with transaction() as connection:
+        insert_audit_log(
+            connection=connection,
+            user_id=user_id,
+            username=username,
+            action=action,
+            target_type=target_type,
+            target_id=target_id,
+            description=description,
+            status=status,
         )
 
-        connection.commit()
 
-    except Exception:
-        connection.rollback()
-        raise
-
-    finally:
-        connection.close()
 def _audit_row_to_dict(row):
-    """Convert an audit-log database row into a dictionary."""
-
     if row is None:
         return None
 
@@ -67,8 +89,6 @@ def _audit_row_to_dict(row):
 
 
 def get_all_audit_logs():
-    """Return all audit logs ordered from newest to oldest."""
-
     connection = get_connection()
 
     try:
@@ -89,15 +109,16 @@ def get_all_audit_logs():
             """
         ).fetchall()
 
-        return [_audit_row_to_dict(row) for row in rows]
+        return [
+            _audit_row_to_dict(row)
+            for row in rows
+        ]
 
     finally:
         connection.close()
 
 
 def search_audit_logs(search_term: str):
-    """Search audit logs by username, action, target type, or description."""
-
     search_term = search_term.strip()
 
     if not search_term:
@@ -121,10 +142,11 @@ def search_audit_logs(search_term: str):
                 status,
                 created_at
             FROM audit_logs
-            WHERE username LIKE ?
-               OR action LIKE ?
-               OR target_type LIKE ?
-               OR description LIKE ?
+            WHERE
+                username LIKE ?
+                OR action LIKE ?
+                OR target_type LIKE ?
+                OR description LIKE ?
             ORDER BY id DESC
             """,
             (
@@ -135,7 +157,10 @@ def search_audit_logs(search_term: str):
             ),
         ).fetchall()
 
-        return [_audit_row_to_dict(row) for row in rows]
+        return [
+            _audit_row_to_dict(row)
+            for row in rows
+        ]
 
     finally:
         connection.close()

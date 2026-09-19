@@ -88,3 +88,24 @@ Retested feature navigation. The sidebar remained visible, feature content opene
 
 **Status:** Resolved
 
+### Error — Commit 37: Employee Service Database Connection
+
+**Date:** 2026-09-19
+
+**Error:** `NameError: name 'get_connection' is not defined`
+
+**Where:** `services/employee_service.py`
+
+**Cause:**  
+The employee service was migrated to use the centralized database transaction system, but `get_connection` was missing from the database import.
+
+**Impact:**  
+Employee records could not be loaded because the application could not find the `get_connection` function.
+
+**Resolution:**  
+Updated the database import to include both `get_connection` and `transaction`.
+
+**Verification:**  
+Retested Employee Management and employee records loaded successfully without the error.
+
+**Status:** Resolved

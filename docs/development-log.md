@@ -879,3 +879,42 @@ During development, an actual Tkinter error was encountered while implementing t
 The issue occurred because the active feature frame was destroyed before it was packed into the content area. The navigation logic was corrected so that the active feature frame is preserved.
 
 The error has been recorded separately in `docs/error-log.md`.
+
+**Status:** Completed.
+
+---
+
+## Commit 37 — Improve Transaction Reliability, Audit Tracking and Error Recovery
+
+### Objective
+Improve system reliability through database transactions, audit logging, centralized error handling, and recovery from failed operations.
+
+### Work Completed
+- Added centralized database transaction management with automatic commit and rollback.
+- Migrated employee, user, and authentication database operations to transactions.
+- Integrated audit logging with employee and user operations.
+- Added audit records for user Create, Update, Activate, and Deactivate actions.
+- Updated Employee and User Management GUI to pass the current user for audit tracking.
+- Added centralized error handling through `services/error_handler.py`.
+- Added runtime error logging through `logs/application.log`.
+- Integrated global error handling into `main.py`.
+- Verified transaction rollback and recovery behavior.
+
+### Error Encountered and Fixed
+- Employee records initially failed to load because `get_connection` was missing from the service import.
+- Fixed the database import and retested successfully.
+
+### Testing
+- Employee CRUD tested successfully.
+- User Create, Update, Activate, and Deactivate tested successfully.
+- Audit records verified successfully.
+- Login, dashboard, navigation, backup/recovery, and logout tested successfully.
+- Error handler tested successfully.
+- Transaction rollback test passed successfully.
+
+### Reliability Improvement
+The system now provides safer database transactions, rollback recovery, complete audit tracking, and centralized handling of unexpected errors.
+
+**Status:** Completed.
+
+---

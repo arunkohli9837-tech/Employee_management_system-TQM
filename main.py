@@ -1,12 +1,15 @@
 import customtkinter as ctk
 
 from services.session import Session
+from services.error_handler import handle_exception
+
 from ui.login import LoginFrame
 from ui.dashboard import DashboardFrame
 from ui.employees import EmployeeManagementFrame
 from ui.users import UserManagementFrame
 from ui.audit_logs import AuditLogsFrame
 from ui.backup import BackupManagementFrame
+
 
 class EmployeeManagementApp(ctk.CTk):
     def __init__(self):
@@ -49,7 +52,10 @@ class EmployeeManagementApp(ctk.CTk):
     def show_dashboard(self, user=None):
         current_user = user or self.session.get_current_user()
 
-        if hasattr(self, "dashboard_frame") and self.dashboard_frame.winfo_exists():
+        if (
+            hasattr(self, "dashboard_frame")
+            and self.dashboard_frame.winfo_exists()
+        ):
             self.dashboard_frame.show_dashboard_content()
             return
 
@@ -119,7 +125,7 @@ class EmployeeManagementApp(ctk.CTk):
             self.dashboard_frame.content,
             user=current_user,
             on_back=self.show_dashboard,
-       )
+        )
 
         self.dashboard_frame.show_feature(
             self.backup_frame,
@@ -132,8 +138,17 @@ class EmployeeManagementApp(ctk.CTk):
 
 
 def main():
-    app = EmployeeManagementApp()
-    app.mainloop()
+    try:
+        app = EmployeeManagementApp()
+        app.mainloop()
+
+    except Exception as error:
+        message = handle_exception(
+            "Application startup/runtime error",
+            error,
+        )
+
+        print(message)
 
 
 if __name__ == "__main__":

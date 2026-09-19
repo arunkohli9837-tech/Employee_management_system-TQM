@@ -1,4 +1,9 @@
-from database.database import get_connection
+from database.database import transaction, get_connection
+from services.audit_service import insert_audit_log
+from services.password_service import hash_password
+
+
+ALLOWED_ROLES = {"Admin", "HR", "Employee"}
 
 
 def _user_row_to_dict(row):
@@ -21,11 +26,7 @@ def get_user_by_id(user_id: int):
     try:
         row = connection.execute(
             """
-            SELECT
-                id,
-                username,
-                role,
-                is_active
+            SELECT id, username, role, is_active
             FROM users
             WHERE id = ?
             """,
@@ -46,11 +47,7 @@ def get_all_users():
     try:
         rows = connection.execute(
             """
-            SELECT
-                id,
-                username,
-                role,
-                is_active
+            SELECT id, username, role, is_active
             FROM users
             ORDER BY id
             """
@@ -61,12 +58,107 @@ def get_all_users():
     finally:
         connection.close()
 
-def deactivate_user(user_id: int):
+
+def update_user(
+    user_id: int,
+    username: str,
+    role: str,
+    password: str = "",
+    performed_by=None,
+):
+    """Update username, role and optionally password."""
+
+    username = username.strip()
+    role = role.strip()
+
+    if not username:
+        raise ValueError("Username must not be empty.")
+
+    if role not in ALLOWED_ROLES:
+        raise ValueError("Invalid user role.")
+
+    with transaction() as connection:
+        existing = connection.execute(
+            """
+            SELECT username
+            FROM users
+            WHERE id = ?
+            """,
+            (user_id,),
+        ).fetchone()
+
+        if existing is None:
+            return False
+
+        old_username = existing[0]
+
+        if password.strip():
+            password_hash = hash_password(password)
+
+            connection.execute(
+                """
+                UPDATE users
+                SET username = ?,
+                    role = ?,
+                    password_hash = ?
+                WHERE id = ?
+                """,
+                (
+                    username,
+                    role,
+                    password_hash,
+                    user_id,
+                ),
+            )
+        else:
+            connection.execute(
+                """
+                UPDATE users
+                SET username = ?,
+                    role = ?
+                WHERE id = ?
+                """,
+                (
+                    username,
+                    role,
+                    user_id,
+                ),
+            )
+
+        if performed_by:
+            insert_audit_log(
+                connection=connection,
+                user_id=performed_by["id"],
+                username=performed_by["username"],
+                action="UPDATE_USER",
+                target_type="User",
+                target_id=user_id,
+                description=f"User {old_username} updated successfully",
+                status="Success",
+            )
+
+        return True
+
+
+def deactivate_user(user_id: int, performed_by=None):
     """Deactivate an active user account."""
 
-    connection = get_connection()
+    with transaction() as connection:
+        row = connection.execute(
+            """
+            SELECT username
+            FROM users
+            WHERE id = ?
+              AND is_active = 1
+            """,
+            (user_id,),
+        ).fetchone()
 
-    try:
+        if row is None:
+            return False
+
+        target_username = row[0]
+
         cursor = connection.execute(
             """
             UPDATE users
@@ -78,26 +170,42 @@ def deactivate_user(user_id: int):
         )
 
         if cursor.rowcount == 0:
-            connection.rollback()
             return False
 
-        connection.commit()
+        if performed_by:
+            insert_audit_log(
+                connection=connection,
+                user_id=performed_by["id"],
+                username=performed_by["username"],
+                action="DEACTIVATE_USER",
+                target_type="User",
+                target_id=user_id,
+                description=f"User {target_username} deactivated successfully",
+                status="Success",
+            )
+
         return True
 
-    except Exception:
-        connection.rollback()
-        raise
 
-    finally:
-        connection.close()
-
-
-def activate_user(user_id: int):
+def activate_user(user_id: int, performed_by=None):
     """Activate an inactive user account."""
 
-    connection = get_connection()
+    with transaction() as connection:
+        row = connection.execute(
+            """
+            SELECT username
+            FROM users
+            WHERE id = ?
+              AND is_active = 0
+            """,
+            (user_id,),
+        ).fetchone()
 
-    try:
+        if row is None:
+            return False
+
+        target_username = row[0]
+
         cursor = connection.execute(
             """
             UPDATE users
@@ -109,15 +217,18 @@ def activate_user(user_id: int):
         )
 
         if cursor.rowcount == 0:
-            connection.rollback()
             return False
 
-        connection.commit()
+        if performed_by:
+            insert_audit_log(
+                connection=connection,
+                user_id=performed_by["id"],
+                username=performed_by["username"],
+                action="ACTIVATE_USER",
+                target_type="User",
+                target_id=user_id,
+                description=f"User {target_username} activated successfully",
+                status="Success",
+            )
+
         return True
-
-    except Exception:
-        connection.rollback()
-        raise
-
-    finally:
-        connection.close()

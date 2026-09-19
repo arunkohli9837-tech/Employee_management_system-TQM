@@ -1,5 +1,7 @@
-from database.database import get_connection
+from database.database import get_connection, transaction
 from services.validation_service import validate_employee_fields
+from services.audit_service import insert_audit_log
+
 
 def _employee_row_to_dict(row):
     if row is None:
@@ -53,6 +55,7 @@ def get_employee_by_id(employee_id: int):
     finally:
         connection.close()
 
+
 def create_employee(
     employee_code: str,
     full_name: str,
@@ -62,8 +65,10 @@ def create_employee(
     designation: str,
     salary: float,
     joining_date: str,
+    performed_by=None,
 ):
     """Create a new employee record and return its database ID."""
+
     validated = validate_employee_fields(
         employee_code,
         full_name,
@@ -84,9 +89,7 @@ def create_employee(
     salary = validated["salary"]
     joining_date = validated["joining_date"]
 
-    connection = get_connection()
-
-    try:
+    with transaction() as connection:
         cursor = connection.execute(
             """
             INSERT INTO employees (
@@ -97,9 +100,10 @@ def create_employee(
                 department,
                 designation,
                 salary,
-                joining_date
+                joining_date,
+                status
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
             (
                 employee_code,
@@ -110,18 +114,26 @@ def create_employee(
                 designation,
                 salary,
                 joining_date,
+                "Active",
             ),
         )
 
-        connection.commit()
-        return cursor.lastrowid
+        employee_id = cursor.lastrowid
 
-    except Exception:
-        connection.rollback()
-        raise
+        if performed_by:
+            insert_audit_log(
+                connection=connection,
+                user_id=performed_by["id"],
+                username=performed_by["username"],
+                action="CREATE_EMPLOYEE",
+                target_type="Employee",
+                target_id=employee_id,
+                description=f"Employee {employee_code} created successfully",
+                status="Success",
+            )
 
-    finally:
-        connection.close() 
+    return employee_id
+
 
 def get_all_employees():
     """Return all employee records ordered by database ID."""
@@ -152,7 +164,8 @@ def get_all_employees():
         return [_employee_row_to_dict(row) for row in rows]
 
     finally:
-        connection.close()   
+        connection.close()
+
 
 def search_employees(search_term: str):
     """Search employees by code, name, email, or department."""
@@ -197,6 +210,7 @@ def search_employees(search_term: str):
     finally:
         connection.close()
 
+
 def update_employee(
     employee_id: int,
     employee_code: str,
@@ -207,6 +221,7 @@ def update_employee(
     designation: str,
     salary: float,
     joining_date: str,
+    performed_by=None,
 ):
     """Update an existing employee record."""
 
@@ -221,7 +236,6 @@ def update_employee(
         joining_date,
     )
 
-
     employee_code = validated["employee_code"]
     full_name = validated["full_name"]
     email = validated["email"]
@@ -231,9 +245,7 @@ def update_employee(
     salary = validated["salary"]
     joining_date = validated["joining_date"]
 
-    connection = get_connection()
-
-    try:
+    with transaction() as connection:
         cursor = connection.execute(
             """
             UPDATE employees
@@ -263,25 +275,27 @@ def update_employee(
         )
 
         if cursor.rowcount == 0:
-            connection.rollback()
             return False
 
-        connection.commit()
+        if performed_by:
+            insert_audit_log(
+                connection=connection,
+                user_id=performed_by["id"],
+                username=performed_by["username"],
+                action="UPDATE_EMPLOYEE",
+                target_type="Employee",
+                target_id=employee_id,
+                description=f"Employee {employee_code} updated successfully",
+                status="Success",
+            )
+
         return True
 
-    except Exception:
-        connection.rollback()
-        raise
 
-    finally:
-        connection.close()
-
-def deactivate_employee(employee_id: int):
+def deactivate_employee(employee_id: int, performed_by=None):
     """Deactivate an employee without permanently deleting the record."""
 
-    connection = get_connection()
-
-    try:
+    with transaction() as connection:
         cursor = connection.execute(
             """
             UPDATE employees
@@ -295,15 +309,18 @@ def deactivate_employee(employee_id: int):
         )
 
         if cursor.rowcount == 0:
-            connection.rollback()
             return False
 
-        connection.commit()
+        if performed_by:
+            insert_audit_log(
+                connection=connection,
+                user_id=performed_by["id"],
+                username=performed_by["username"],
+                action="DEACTIVATE_EMPLOYEE",
+                target_type="Employee",
+                target_id=employee_id,
+                description=f"Employee ID {employee_id} deactivated successfully",
+                status="Success",
+            )
+
         return True
-
-    except Exception:
-        connection.rollback()
-        raise
-
-    finally:
-        connection.close()

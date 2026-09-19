@@ -1,15 +1,19 @@
 import sqlite3
 
-from database.database import get_connection
+from database.database import get_connection,transaction
 from services.password_service import hash_password, verify_password
-from services.audit_service import create_audit_log
+from services.audit_service import create_audit_log,insert_audit_log
 
 
 ALLOWED_ROLES = {"Admin", "HR", "Employee"}
 
 
-def create_user(username: str, password: str, role: str) -> None:
-    """Create a new application user."""
+def create_user(
+    username: str,
+    password: str,
+    role: str,
+    performed_by=None,
+) -> None:
     username = username.strip()
 
     if not username:
@@ -23,10 +27,8 @@ def create_user(username: str, password: str, role: str) -> None:
 
     password_hash = hash_password(password)
 
-    connection = get_connection()
-
-    try:
-        connection.execute(
+    with transaction() as connection:
+        cursor = connection.execute(
             """
             INSERT INTO users (
                 username,
@@ -36,22 +38,27 @@ def create_user(username: str, password: str, role: str) -> None:
             )
             VALUES (?, ?, ?, ?)
             """,
-            (username, password_hash, role, 1),
+            (
+                username,
+                password_hash,
+                role,
+                1,
+            ),
         )
 
-        connection.commit()
+        user_id = cursor.lastrowid
 
-    except sqlite3.IntegrityError:
-        connection.rollback()
-        raise
-
-    except sqlite3.Error:
-        connection.rollback()
-        raise
-
-    finally:
-        connection.close()
-
+        if performed_by:
+            insert_audit_log(
+                connection=connection,
+                user_id=performed_by["id"],
+                username=performed_by["username"],
+                action="CREATE_USER",
+                target_type="User",
+                target_id=user_id,
+                description=f"User {username} created successfully",
+                status="Success",
+            )
 
 def authenticate_user(username: str, password: str):
     """

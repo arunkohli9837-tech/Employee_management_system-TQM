@@ -70,7 +70,7 @@ Only features that are actually implemented and tested will be documented as com
 
 ---
 
-## Planned Technology Stack
+## Technology Stack
 
 | Area | Technology |
 |---|---|
@@ -87,14 +87,16 @@ Additional Python modules will only be introduced when they are genuinely requir
 
 ---
 
-## Planned System Areas
+## Implemented System Areas
 
-The system is expected to be developed incrementally around areas such as:
+The current system includes:
 
 - Authentication
 - User and role management
 - Employee management
 - Employee search
+- Basic monthly payroll records (basic salary − deductions + bonus)
+- Employee performance logs (dated rating and comments)
 - Input validation
 - Audit logging
 - Error handling
@@ -106,6 +108,32 @@ The system is expected to be developed incrementally around areas such as:
 The final feature set will reflect the functionality that is actually implemented during development.
 
 ---
+
+## Setup and Run (Windows PowerShell)
+
+```powershell
+python -m venv .venv
+.venv\Scripts\activate
+python -m pip install --upgrade pip
+pip install -r requirements.txt
+python -m scripts.create_admin  # first run only, if no user exists
+python -m compileall -q .
+python -m unittest discover -s tests -v
+python main.py
+```
+
+On a fresh install, run `python -m scripts.create_admin` once to create your own administrator credentials. This command refuses to create a bootstrap account if any user already exists. Then run `python main.py`. The application initializes its schema and attempts an automatic backup at startup. Use fictional sample records during demonstrations. The application creates a local SQLite database under `data/` and backup/log folders as needed. These runtime files should not be committed.
+
+## Review 1 and Review 2 Evidence
+
+- SRS: `docs/requirements.md`
+- Architecture and process flow: `docs/architecture.md`, `docs/diagrams/`
+- Stakeholders and traceability: `docs/stakeholders_and_workflows.md`, `docs/requirements_traceability.md`
+- User manual: `docs/user_manual.md`
+- Review checklist/demo script: `docs/review1_review2_readiness.md`, `docs/review_demo_script.md`
+- Reliability tests: `tests/test_reliability.py`
+
+The five Q01 features are automatic backup, audit log, input validation, error recovery and user roles. Run the tests on the presentation laptop and demonstrate the GUI live; source code alone is not proof that a GUI workflow works.
 
 ## Development Approach
 

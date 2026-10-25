@@ -109,3 +109,7 @@ Updated the database import to include both `get_connection` and `transaction`.
 Retested Employee Management and employee records loaded successfully without the error.
 
 **Status:** Resolved
+
+## Current project verification note — October 2026
+
+The prepared build's service/database suite previously reported 14 passing tests. This is not a claim that every GUI path was tested in the current environment. Re-run the test commands and verify the Windows GUI before final submission. Add new defects only when observed; retain the original defect history above.

@@ -1,6 +1,7 @@
 from database.database import transaction, get_connection
 from services.audit_service import insert_audit_log
 from services.password_service import hash_password
+from services.access_control import require_permission
 
 
 ALLOWED_ROLES = {"Admin", "HR", "Employee"}
@@ -68,6 +69,7 @@ def update_user(
 ):
     """Update username, role and optionally password."""
 
+    require_permission(performed_by, "manage_users")
     username = username.strip()
     role = role.strip()
 
@@ -143,6 +145,7 @@ def update_user(
 def deactivate_user(user_id: int, performed_by=None):
     """Deactivate an active user account."""
 
+    require_permission(performed_by, "manage_users")
     with transaction() as connection:
         row = connection.execute(
             """
@@ -190,6 +193,7 @@ def deactivate_user(user_id: int, performed_by=None):
 def activate_user(user_id: int, performed_by=None):
     """Activate an inactive user account."""
 
+    require_permission(performed_by, "manage_users")
     with transaction() as connection:
         row = connection.execute(
             """

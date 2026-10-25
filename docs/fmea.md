@@ -52,3 +52,7 @@ FMEA helps identify potential failures and connect them with appropriate reliabi
 ## Review
 
 The FMEA can be updated when new reliability risks or system features are identified.
+
+## Current project coverage update — October 2026
+
+The current application feature set includes role-based access, employee/user data validation, audit logging, backup/restore, transaction handling, payroll duplicate checks and performance-rating validation. Review the existing risk table against these controls after any code change. Existing Severity/Occurrence/Detection scores should be treated as prioritization estimates unless measured project data supports them.

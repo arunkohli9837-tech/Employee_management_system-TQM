@@ -14,3 +14,7 @@ The intentional exception was caught and the inserted record was successfully ro
 
 ### Status
 Passed
+
+## Current build verification note — October 2026
+
+The prepared build previously reported **14 automated service/database tests passed**. CustomTkinter was unavailable in the assistant build environment, so this does not certify live GUI rendering. On the target Windows machine, rerun compilation and automated tests, then capture genuine screenshots for employee CRUD, validation, user-role restrictions, audit logs, backup/restore, payroll and performance logs. Record the actual date and outcome of that run rather than reusing earlier results as a new test execution.

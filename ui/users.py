@@ -20,7 +20,7 @@ class UserManagementFrame(ctk.CTkFrame):
 
         self.configure(fg_color=("gray95", "gray10"))
 
-        self.grid_columnconfigure(0, weight=0, minsize=390)
+        self.grid_columnconfigure(0, weight=0, minsize=0)
         self.grid_columnconfigure(1, weight=1)
         self.grid_rowconfigure(1, weight=1)
 
@@ -68,330 +68,92 @@ class UserManagementFrame(ctk.CTkFrame):
     # =========================================================
 
     def create_account_panel(self):
-        self.account_panel = ctk.CTkFrame(self)
-
+        """Create a compact account editor embedded on the left of the table."""
+        self.account_panel = ctk.CTkFrame(self, corner_radius=14, width=260)
         self.account_panel.grid(
-            row=1,
-            column=0,
-            sticky="nsew",
-            padx=(30, 12),
-            pady=(0, 30),
+            row=1, column=0, sticky="nsew", padx=(24, 8), pady=(0, 24)
         )
-
-        self.account_panel.grid_columnconfigure(
-            0,
-            weight=1,
-        )
-
-        self.account_panel.grid_rowconfigure(
-            1,
-            weight=1,
-        )
+        self.account_panel.grid_propagate(False)
+        self.account_panel.grid_columnconfigure(0, weight=1)
+        self.account_panel.grid_remove()
 
         self.account_title = ctk.CTkLabel(
-            self.account_panel,
-            text="User Account",
-            font=ctk.CTkFont(
-                size=21,
-                weight="bold",
-            ),
+            self.account_panel, text="Add User",
+            font=ctk.CTkFont(size=21, weight="bold")
         )
+        self.account_title.grid(row=0, column=0, sticky="w", padx=12, pady=(10, 6))
 
-        self.account_title.grid(
-            row=0,
-            column=0,
-            sticky="w",
-            padx=25,
-            pady=(25, 15),
-        )
+        self.account_fields = ctk.CTkScrollableFrame(self.account_panel, fg_color="transparent")
+        self.account_fields.grid(row=1, column=0, sticky="nsew", padx=5, pady=(0, 4))
+        self.account_fields.grid_columnconfigure(0, weight=1)
+        self.account_panel.grid_rowconfigure(1, weight=1)
 
-        self.account_scroll = ctk.CTkScrollableFrame(
-            self.account_panel,
-            fg_color="transparent",
-        )
-
-        self.account_scroll.grid(
-            row=1,
-            column=0,
-            sticky="nsew",
-            padx=10,
-            pady=(0, 10),
-        )
-
-        self.account_scroll.grid_columnconfigure(
-            0,
-            weight=1,
-        )
-
-        # -----------------------------------------------------
-        # Username
-        # -----------------------------------------------------
-
-        self.username_label = ctk.CTkLabel(
-            self.account_scroll,
-            text="Username",
-            font=ctk.CTkFont(
-                size=14,
-                weight="bold",
-            ),
-            anchor="w",
-        )
-
-        self.username_label.grid(
-            row=0,
-            column=0,
-            sticky="w",
-            padx=15,
-            pady=(5, 5),
-        )
-
-        self.username_entry = ctk.CTkEntry(
-            self.account_scroll,
-            height=38,
-        )
-
-        self.username_entry.grid(
-            row=1,
-            column=0,
-            sticky="ew",
-            padx=15,
-            pady=(0, 12),
-        )
-
-        # -----------------------------------------------------
-        # Role
-        # -----------------------------------------------------
-
-        self.role_label = ctk.CTkLabel(
-            self.account_scroll,
-            text="User Role",
-            font=ctk.CTkFont(
-                size=14,
-                weight="bold",
-            ),
-            anchor="w",
-        )
-
-        self.role_label.grid(
-            row=2,
-            column=0,
-            sticky="w",
-            padx=15,
-            pady=(5, 5),
-        )
-
-        self.role_entry = ctk.CTkEntry(
-            self.account_scroll,
-            height=38,
-        )
-
-        self.role_entry.grid(
-            row=3,
-            column=0,
-            sticky="ew",
-            padx=15,
-            pady=(0, 12),
-        )
-
-        # -----------------------------------------------------
-        # Password
-        # -----------------------------------------------------
-
-        self.password_label = ctk.CTkLabel(
-            self.account_scroll,
-            text="Password",
-            font=ctk.CTkFont(
-                size=14,
-                weight="bold",
-            ),
-            anchor="w",
-        )
-
-        self.password_label.grid(
-            row=4,
-            column=0,
-            sticky="w",
-            padx=15,
-            pady=(5, 5),
-        )
-
-        self.password_entry = ctk.CTkEntry(
-            self.account_scroll,
-            height=38,
-            show="*",
-        )
-
-        self.password_entry.grid(
-            row=5,
-            column=0,
-            sticky="ew",
-            padx=15,
-            pady=(0, 12),
-        )
-
-        # -----------------------------------------------------
-        # Status
-        # -----------------------------------------------------
-
-        self.status_label = ctk.CTkLabel(
-            self.account_scroll,
-            text="Account Status",
-            font=ctk.CTkFont(
-                size=14,
-                weight="bold",
-            ),
-            anchor="w",
-        )
-
-        self.status_label.grid(
-            row=6,
-            column=0,
-            sticky="w",
-            padx=15,
-            pady=(5, 5),
-        )
-
-        self.status_entry = ctk.CTkEntry(
-            self.account_scroll,
-            height=38,
-        )
-
-        self.status_entry.grid(
-            row=7,
-            column=0,
-            sticky="ew",
-            padx=15,
-            pady=(0, 20),
-        )
-
-        # -----------------------------------------------------
-        # Information
-        # -----------------------------------------------------
+        self.username_entry = self._create_labeled_entry(0, "Username", "Enter username")
+        self.role_entry = self._create_labeled_entry(1, "User Role", "e.g. admin, hr, employee")
+        self.password_entry = self._create_labeled_entry(2, "Password", "Enter password", show="*")
+        self.status_entry = self._create_labeled_entry(3, "Account Status", "Status appears when selected")
+        self.status_entry.configure(state="disabled")
 
         self.info_label = ctk.CTkLabel(
-            self.account_scroll,
-            text=(
-                "Select a user from the records panel "
-                "to manage the account."
-            ),
-            font=ctk.CTkFont(size=13),
-            text_color=("gray45", "gray65"),
-            wraplength=300,
-            justify="left",
-            anchor="w",
-        )
-
-        self.info_label.grid(
-            row=8,
-            column=0,
-            sticky="w",
-            padx=15,
-            pady=(5, 20),
-        )
-
-        # =====================================================
-        # ACTION BUTTONS
-        # =====================================================
-
-        self.action_frame = ctk.CTkFrame(
             self.account_panel,
-            fg_color="transparent",
+            text="Add a new user or select a user to update.",
+            text_color=("gray45", "gray65"), anchor="w", justify="left", wraplength=260,
         )
+        self.info_label.grid(row=2, column=0, sticky="ew", padx=14, pady=(4, 8))
 
-        self.action_frame.grid(
-            row=2,
-            column=0,
-            sticky="ew",
-            padx=25,
-            pady=(5, 25),
-        )
-
-        self.action_frame.grid_columnconfigure(
-            0,
-            weight=1,
-        )
-
-        # Add User
-        self.add_button = ctk.CTkButton(
-            self.action_frame,
-            text="Add User",
-            height=40,
-            command=self.add_user,
-        )
-
-        self.add_button.grid(
-            row=0,
-            column=0,
-            sticky="ew",
-            pady=(0, 8),
-        )
-
-        # Update User
+        self.action_frame = ctk.CTkFrame(self.account_panel, fg_color="transparent")
+        self.action_frame.grid(row=3, column=0, sticky="ew", padx=10, pady=(4, 14))
+        self.action_frame.grid_columnconfigure(0, weight=1)
+        self.action_frame.grid_columnconfigure(1, weight=1)
+        self.add_button = ctk.CTkButton(self.action_frame, text="Add User", height=35, command=self.add_user)
+        self.add_button.grid(row=0, column=0, sticky="ew", padx=(0, 4))
         self.update_button = ctk.CTkButton(
-            self.action_frame,
-            text="Update User",
-            height=40,
-            state="disabled",
+            self.action_frame, text="Update User", height=35, state="disabled",
             command=self.update_selected_user,
         )
-
-        self.update_button.grid(
-            row=1,
-            column=0,
-            sticky="ew",
-            pady=4,
-        )
-
-        # Activate User
-        self.activate_button = ctk.CTkButton(
-            self.action_frame,
-            text="Activate User",
-            height=40,
-            state="disabled",
-            command=self.activate_selected_user,
-        )
-
-        self.activate_button.grid(
-            row=2,
-            column=0,
-            sticky="ew",
-            pady=4,
-        )
-
-        # Deactivate User
-        self.deactivate_button = ctk.CTkButton(
-            self.action_frame,
-            text="Deactivate User",
-            height=40,
-            fg_color="#b91c1c",
-            hover_color="#991b1b",
-            state="disabled",
-            command=self.deactivate_selected_user,
-        )
-
-        self.deactivate_button.grid(
-            row=3,
-            column=0,
-            sticky="ew",
-            pady=4,
-        )
-
-        # Clear Selection
+        self.update_button.grid(row=1, column=0, columnspan=2, sticky="ew", pady=(7, 0))
         self.clear_button = ctk.CTkButton(
-            self.action_frame,
-            text="Clear Selection",
-            height=40,
-            fg_color="#4b5563",
-            hover_color="#374151",
-            command=self.clear_selection,
+            self.action_frame, text="Cancel / Hide", height=35,
+            fg_color="#4b5563", hover_color="#374151", command=self.clear_selection,
         )
+        self.clear_button.grid(row=0, column=1, sticky="ew", padx=(4, 0))
 
-        self.clear_button.grid(
-            row=4,
-            column=0,
-            sticky="ew",
-            pady=(8, 0),
+    def _create_labeled_entry(self, row, label_text, placeholder, show=None):
+        field = ctk.CTkFrame(self.account_fields, fg_color="transparent")
+        field.grid(row=row, column=0, sticky="ew", padx=4, pady=2)
+        field.grid_columnconfigure(0, weight=1)
+        ctk.CTkLabel(field, text=label_text, anchor="w", font=ctk.CTkFont(size=12, weight="bold")).grid(
+            row=0, column=0, sticky="ew", pady=(0, 3)
         )
+        options = {"height": 30, "placeholder_text": placeholder}
+        if show:
+            options["show"] = show
+        entry = ctk.CTkEntry(field, **options)
+        entry.grid(row=1, column=0, sticky="ew")
+        return entry
+
+    def open_add_form(self):
+        self.clear_account_fields()
+        self.selected_user_id = None
+        self.update_toolbar_button.configure(state="disabled")
+        self.info_label.configure(text="Create a new user account.")
+        self.account_title.configure(text="Add User")
+        self.add_button.configure(state="normal")
+        self.update_button.configure(state="disabled")
+        self.grid_columnconfigure(0, weight=0, minsize=260)
+        self.account_panel.grid()
+        self.account_panel.lift()
+
+    def open_update_form(self):
+        if self.selected_user_id is None:
+            messagebox.showwarning("No User Selected", "Please select a user before updating.")
+            return
+        self.account_title.configure(text="Update User")
+        self.add_button.configure(state="disabled")
+        self.update_button.configure(state="normal")
+        self.grid_columnconfigure(0, weight=0, minsize=260)
+        self.account_panel.grid()
+        self.account_panel.lift()
 
     # =========================================================
     # RIGHT RECORDS PANEL
@@ -404,8 +166,8 @@ class UserManagementFrame(ctk.CTkFrame):
             row=1,
             column=1,
             sticky="nsew",
-            padx=(12, 30),
-            pady=(0, 30),
+            padx=(8, 24),
+            pady=(0, 24),
         )
 
         self.records_panel.grid_columnconfigure(
@@ -476,6 +238,17 @@ class UserManagementFrame(ctk.CTkFrame):
             row=0,
             column=2,
         )
+
+        self.add_toolbar_button = ctk.CTkButton(
+            self.search_frame, text="+ Add User", width=105, height=38,
+            command=self.open_add_form,
+        )
+        self.add_toolbar_button.grid(row=0, column=3, padx=(8, 0))
+        self.update_toolbar_button = ctk.CTkButton(
+            self.search_frame, text="Update Selected", width=135, height=38,
+            state="disabled", command=self.open_update_form,
+        )
+        self.update_toolbar_button.grid(row=0, column=4, padx=(8, 0))
 
         # Records title
         self.records_title = ctk.CTkLabel(
@@ -562,6 +335,9 @@ class UserManagementFrame(ctk.CTkFrame):
                 ):
                     filtered_users.append(user)
 
+            self.selected_user_id = None
+            self.clear_account_fields()
+            self.set_action_buttons_disabled()
             self.display_users(filtered_users)
 
         except Exception as error:
@@ -606,18 +382,14 @@ class UserManagementFrame(ctk.CTkFrame):
             pady=(0, 5),
         )
 
-        columns = [
-            ("ID", 0),
-            ("Username", 1),
-            ("Role", 2),
-            ("Status", 3),
-        ]
-
+        columns = [("ID", 0), ("Username", 1), ("Role", 2), ("Status / Action", 3)]
+        # Use the same fixed column geometry for the header and every data row.
+        # The compact table avoids spreading Username and Role across the full
+        # window, which caused the previous excessive gap.
+        widths = [60, 190, 150, 160]
+        self.user_column_widths = widths
         for text, column in columns:
-            header.grid_columnconfigure(
-                column,
-                weight=1,
-            )
+            header.grid_columnconfigure(column, weight=0, minsize=widths[column])
 
             label = ctk.CTkLabel(
                 header,
@@ -627,6 +399,7 @@ class UserManagementFrame(ctk.CTkFrame):
                     weight="bold",
                 ),
                 anchor="w",
+                width=widths[column] - 16,
             )
 
             label.grid(
@@ -664,11 +437,11 @@ class UserManagementFrame(ctk.CTkFrame):
             pady=3,
         )
 
-        for column in range(4):
-            row_frame.grid_columnconfigure(
-                column,
-                weight=1,
-            )
+        # Match the header's exact column widths so each value stays beneath
+        # its own heading without an oversized Username-to-Role gap.
+        widths = self.user_column_widths
+        for column, width in enumerate(widths):
+            row_frame.grid_columnconfigure(column, weight=0, minsize=width)
 
         status = (
             "Active"
@@ -684,26 +457,26 @@ class UserManagementFrame(ctk.CTkFrame):
         ]
 
         for column, value in enumerate(values):
+            if column == 3:
+                is_active = bool(user["is_active"])
+                action = ctk.CTkOptionMenu(
+                    row_frame,
+                    values=["Active", "Deactivate"] if is_active else ["Inactive", "Activate"],
+                    width=88, height=25,
+                    fg_color="#2563a6" if is_active else "#b91c1c",
+                    button_color="#1d4ed8" if is_active else "#991b1b",
+                    button_hover_color="#1e40af" if is_active else "#7f1d1d",
+                    command=lambda choice, selected=user: self._user_status_choice(selected, choice),
+                )
+                action.set("Active" if is_active else "Inactive")
+                action.grid(row=0, column=column, sticky="w", padx=5, pady=5)
+                continue
             label = ctk.CTkLabel(
-                row_frame,
-                text=str(value),
-                anchor="w",
-                font=ctk.CTkFont(size=12),
+                row_frame, text=str(value), anchor="w", width=widths[column] - 12,
+                font=ctk.CTkFont(size=11),
             )
-
-            label.grid(
-                row=0,
-                column=column,
-                sticky="ew",
-                padx=8,
-                pady=9,
-            )
-
-            label.bind(
-                "<Button-1>",
-                lambda event, selected=user:
-                self.select_user(selected),
-            )
+            label.grid(row=0, column=column, sticky="ew", padx=8, pady=9)
+            label.bind("<Button-1>", lambda event, selected=user: self.select_user(selected))
 
         row_frame.bind(
             "<Button-1>",
@@ -711,11 +484,31 @@ class UserManagementFrame(ctk.CTkFrame):
             self.select_user(selected),
         )
 
+    def _user_status_choice(self, user, choice):
+        # Refresh the row from persisted data after the confirmation/action.
+        # This resets the menu if the user cancels or the operation fails.
+        if choice == "Activate":
+            self._change_user_status(user, True)
+        elif choice == "Deactivate":
+            self._change_user_status(user, False)
+        elif choice == "Active" or choice == "Inactive":
+            self.load_users()
+
+    def _change_user_status(self, user, activate):
+        self.select_user(user)
+        if activate:
+            self.activate_selected_user()
+        else:
+            self.deactivate_selected_user()
+
     # =========================================================
     # SELECT USER
     # =========================================================
 
     def select_user(self, user):
+        # Clicking a table record hides the editor; use Update Selected to reopen it.
+        self.account_panel.grid_remove()
+        self.grid_columnconfigure(0, weight=0, minsize=0)
         self.selected_user_id = user["id"]
 
         status = (
@@ -734,10 +527,9 @@ class UserManagementFrame(ctk.CTkFrame):
             user["role"],
         )
 
-        self.set_field_value(
-            self.status_entry,
-            status,
-        )
+        self.status_entry.configure(state="normal")
+        self.set_field_value(self.status_entry, status)
+        self.status_entry.configure(state="disabled")
 
         self.password_entry.delete(0, "end")
 
@@ -749,27 +541,8 @@ class UserManagementFrame(ctk.CTkFrame):
             ),
         )
 
-        self.update_button.configure(
-            state="normal",
-        )
-
-        if user["is_active"]:
-            self.activate_button.configure(
-                state="disabled",
-            )
-
-            self.deactivate_button.configure(
-                state="normal",
-            )
-
-        else:
-            self.activate_button.configure(
-                state="normal",
-            )
-
-            self.deactivate_button.configure(
-                state="disabled",
-            )
+        self.update_button.configure(state="normal")
+        self.update_toolbar_button.configure(state="normal")
 
     # =========================================================
     # ADD USER
@@ -838,6 +611,7 @@ class UserManagementFrame(ctk.CTkFrame):
                     "Update User",
                     "User could not be updated.",
                 )
+                self._restore_selected_user_role()
                 return
 
             messagebox.showinfo(
@@ -853,12 +627,29 @@ class UserManagementFrame(ctk.CTkFrame):
                 "Validation Error",
                 str(error),
             )
+            self._restore_selected_user_role()
 
         except Exception as error:
             messagebox.showerror(
                 "User Update",
                 f"Unable to update user:\n{error}",
             )
+            self._restore_selected_user_role()
+
+    def _restore_selected_user_role(self):
+        """Restore the role field from persisted data after a rejected/failed update."""
+        if self.selected_user_id is None:
+            return
+        try:
+            persisted_user = next(
+                (item for item in get_all_users() if item["id"] == self.selected_user_id),
+                None,
+            )
+            if persisted_user is not None:
+                self.set_field_value(self.role_entry, persisted_user["role"])
+        except Exception:
+            # Keep the original validation/error feedback if a refresh also fails.
+            pass
 
     # =========================================================
     # ACTIVATE USER
@@ -874,6 +665,7 @@ class UserManagementFrame(ctk.CTkFrame):
         )
 
         if not confirmation:
+            self.load_users()
             return
 
         try:
@@ -887,6 +679,7 @@ class UserManagementFrame(ctk.CTkFrame):
                     "Activate User",
                     "User could not be activated.",
                 )
+                self.load_users()
                 return
 
             messagebox.showinfo(
@@ -901,6 +694,7 @@ class UserManagementFrame(ctk.CTkFrame):
                 "Activate User",
                 f"Unable to activate user:\n{error}",
             )
+            self.load_users()
 
     # =========================================================
     # DEACTIVATE USER
@@ -915,6 +709,7 @@ class UserManagementFrame(ctk.CTkFrame):
                 "Action Not Allowed",
                 "You cannot deactivate your own account.",
             )
+            self.load_users()
             return
 
         confirmation = messagebox.askyesno(
@@ -923,6 +718,7 @@ class UserManagementFrame(ctk.CTkFrame):
         )
 
         if not confirmation:
+            self.load_users()
             return
 
         try:
@@ -936,6 +732,7 @@ class UserManagementFrame(ctk.CTkFrame):
                     "Deactivate User",
                     "User could not be deactivated.",
                 )
+                self.load_users()
                 return
 
             messagebox.showinfo(
@@ -950,6 +747,7 @@ class UserManagementFrame(ctk.CTkFrame):
                 "Deactivate User",
                 f"Unable to deactivate user:\n{error}",
             )
+            self.load_users()
 
     # =========================================================
     # CLEAR SELECTION
@@ -961,32 +759,26 @@ class UserManagementFrame(ctk.CTkFrame):
         self.clear_account_fields()
         self.set_action_buttons_disabled()
 
-        self.info_label.configure(
-            text=(
-                "Select a user from the records panel "
-                "to manage the account."
-            ),
-        )
+        self.info_label.configure(text="Add a new user or update the selected account.")
+        self.add_button.configure(state="normal")
+        self.update_button.configure(state="disabled")
+        self.update_toolbar_button.configure(state="disabled")
+        if hasattr(self, "account_panel"):
+            self.account_panel.grid_remove()
+            self.grid_columnconfigure(0, weight=0, minsize=0)
 
     def clear_account_fields(self):
         self.username_entry.delete(0, "end")
         self.role_entry.delete(0, "end")
         self.password_entry.delete(0, "end")
+        self.status_entry.configure(state="normal")
         self.status_entry.delete(0, "end")
+        self.status_entry.configure(state="disabled")
 
     def set_field_value(self, entry, value):
         entry.delete(0, "end")
         entry.insert(0, str(value))
 
     def set_action_buttons_disabled(self):
-        self.update_button.configure(
-            state="disabled",
-        )
-
-        self.activate_button.configure(
-            state="disabled",
-        )
-
-        self.deactivate_button.configure(
-            state="disabled",
-        )
+        self.update_button.configure(state="disabled")
+        self.update_toolbar_button.configure(state="disabled")

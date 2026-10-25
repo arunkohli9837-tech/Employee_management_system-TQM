@@ -211,3 +211,7 @@ Remaining planned additions include:
 - TQM reliability analysis documentation based on actual project data.
 
 Any architectural change will be documented when it is actually implemented.
+
+## Current implementation update — October 2026
+
+The implemented desktop application uses Python, CustomTkinter and SQLite. Current feature areas include authentication and role-based access, employee CRUD/deactivation, user management, audit logs, backup/restore, validation/error handling, and basic payroll and performance-log workflows. The current project also contains service/database reliability tests. GUI behavior should be verified on the target Windows machine; automated service tests alone do not verify visual rendering.

@@ -3,6 +3,7 @@ import customtkinter as ctk
 from services.session import Session
 from services.error_handler import handle_exception
 from services.backup_service import create_automatic_backup
+from database.database import initialize_database
 
 from ui.login import LoginFrame
 from ui.dashboard import DashboardFrame
@@ -10,6 +11,7 @@ from ui.employees import EmployeeManagementFrame
 from ui.users import UserManagementFrame
 from ui.audit_logs import AuditLogsFrame
 from ui.backup import BackupManagementFrame
+from ui.hr_operations import HROperationsFrame
 
 
 class EmployeeManagementApp(ctk.CTk):
@@ -17,8 +19,8 @@ class EmployeeManagementApp(ctk.CTk):
         super().__init__()
 
         self.title("Employee Management System")
-        self.geometry("1000x650")
-        self.minsize(900, 600)
+        self.geometry("1280x800")
+        self.minsize(1100, 700)
 
         self.session = Session()
 
@@ -70,6 +72,7 @@ class EmployeeManagementApp(ctk.CTk):
             on_user_management=self.show_user_management,
             on_audit_logs=self.show_audit_logs,
             on_backup_management=self.show_backup_management,
+            on_hr_operations=self.show_hr_operations,
         )
 
         self.dashboard_frame.pack(
@@ -133,6 +136,17 @@ class EmployeeManagementApp(ctk.CTk):
             self.dashboard_frame.backup_button,
         )
 
+    def show_hr_operations(self):
+        current_user = self.session.get_current_user()
+        self.hr_operations_frame = HROperationsFrame(
+            self.dashboard_frame.content,
+            user=current_user,
+        )
+        self.dashboard_frame.show_feature(
+            self.hr_operations_frame,
+            self.dashboard_frame.hr_operations_button,
+        )
+
     def handle_logout(self):
         try:
             create_automatic_backup()
@@ -150,6 +164,8 @@ class EmployeeManagementApp(ctk.CTk):
 
 def main():
     try:
+        # Ensure schema exists on first launch before attempting a backup.
+        initialize_database()
         # Create an automatic database backup before starting the application.
         create_automatic_backup()
 

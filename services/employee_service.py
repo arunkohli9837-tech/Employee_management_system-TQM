@@ -1,6 +1,13 @@
 from database.database import get_connection, transaction
 from services.validation_service import validate_employee_fields
 from services.audit_service import insert_audit_log
+from services.access_control import require_permission
+
+
+def _require_employee_manager(user):
+    if user is None:
+        raise PermissionError("An authenticated Admin or HR user is required.")
+    require_permission(user, "manage_employees")
 
 
 def _employee_row_to_dict(row):
@@ -69,6 +76,7 @@ def create_employee(
 ):
     """Create a new employee record and return its database ID."""
 
+    _require_employee_manager(performed_by)
     validated = validate_employee_fields(
         employee_code,
         full_name,
@@ -225,6 +233,7 @@ def update_employee(
 ):
     """Update an existing employee record."""
 
+    _require_employee_manager(performed_by)
     validated = validate_employee_fields(
         employee_code,
         full_name,
@@ -295,6 +304,7 @@ def update_employee(
 def deactivate_employee(employee_id: int, performed_by=None):
     """Deactivate an employee without permanently deleting the record."""
 
+    _require_employee_manager(performed_by)
     with transaction() as connection:
         cursor = connection.execute(
             """

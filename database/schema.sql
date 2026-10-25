@@ -75,3 +75,33 @@ CREATE TABLE IF NOT EXISTS backup_history (
         REFERENCES users(id)
         ON DELETE SET NULL
 );
+
+-- Payroll records are stored per employee and pay period. This project uses
+-- simple monthly salary figures; statutory tax/benefit calculations are out of scope.
+CREATE TABLE IF NOT EXISTS payroll_records (
+    id INTEGER PRIMARY KEY,
+    employee_id INTEGER NOT NULL,
+    pay_period TEXT NOT NULL,
+    basic_salary REAL NOT NULL CHECK (basic_salary >= 0),
+    deductions REAL NOT NULL DEFAULT 0 CHECK (deductions >= 0),
+    bonus REAL NOT NULL DEFAULT 0 CHECK (bonus >= 0),
+    net_salary REAL NOT NULL CHECK (net_salary >= 0),
+    created_by INTEGER,
+    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE (employee_id, pay_period),
+    FOREIGN KEY (employee_id) REFERENCES employees(id),
+    FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL,
+    CHECK (net_salary >= 0)
+);
+
+CREATE TABLE IF NOT EXISTS performance_logs (
+    id INTEGER PRIMARY KEY,
+    employee_id INTEGER NOT NULL,
+    review_date TEXT NOT NULL,
+    rating INTEGER NOT NULL CHECK (rating BETWEEN 1 AND 5),
+    comments TEXT NOT NULL CHECK (length(trim(comments)) > 0),
+    created_by INTEGER,
+    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (employee_id) REFERENCES employees(id),
+    FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL
+);

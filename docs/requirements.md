@@ -601,3 +601,7 @@ Apply Improvements
 Retest
         ↓
 Document Results
+
+## Current implementation status note — October 2026
+
+The current project implementation includes authentication, role-based access, employee create/view/search/update/deactivation, user management, input validation, audit logging, backup/restore, error handling, basic monthly payroll and performance logs. Automated service/database tests have previously reported 14 passes. Final GUI verification and actual screenshot evidence should be recorded separately; do not mark GUI-only behavior verified based solely on service tests.

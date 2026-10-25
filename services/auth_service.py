@@ -3,6 +3,7 @@ import sqlite3
 from database.database import get_connection,transaction
 from services.password_service import hash_password, verify_password
 from services.audit_service import create_audit_log,insert_audit_log
+from services.access_control import require_permission
 
 
 ALLOWED_ROLES = {"Admin", "HR", "Employee"}
@@ -15,6 +16,18 @@ def create_user(
     performed_by=None,
 ) -> None:
     username = username.strip()
+
+    if performed_by is not None:
+        require_permission(performed_by, "manage_users")
+    else:
+        # Permit no-actor creation only for the first-run bootstrap account.
+        connection = get_connection()
+        try:
+            existing_users = connection.execute("SELECT COUNT(*) FROM users").fetchone()[0]
+        finally:
+            connection.close()
+        if existing_users:
+            raise PermissionError("An authenticated administrator is required to create users.")
 
     if not username:
         raise ValueError("Username must not be empty.")

@@ -17,6 +17,7 @@ class DashboardFrame(ctk.CTkFrame):
         on_user_management,
         on_audit_logs,
         on_backup_management=None,
+        on_hr_operations=None,
     ):
         super().__init__(master)
 
@@ -26,6 +27,7 @@ class DashboardFrame(ctk.CTkFrame):
         self.on_user_management = on_user_management
         self.on_audit_logs = on_audit_logs
         self.on_backup_management = on_backup_management
+        self.on_hr_operations = on_hr_operations
 
         self.configure(fg_color=("gray95", "gray10"))
 
@@ -128,16 +130,18 @@ class DashboardFrame(ctk.CTkFrame):
                 self.on_audit_logs,
             )
 
+        if has_permission(self.user, "manage_hr_operations"):
+            self.hr_operations_button = self.create_nav_button(
+                "▤   Payroll & Performance",
+                self.on_hr_operations,
+            )
+
         if has_permission(self.user, "manage_backups"):
             self.backup_button = self.create_nav_button(
                 "▣   Backups",
                 self.on_backup_management,
             )
 
-        self.reliability_button = self.create_nav_button(
-            "◇   Reliability",
-            None,
-        )
 
     def set_active_navigation(self, active_button):
         buttons = [
@@ -146,7 +150,7 @@ class DashboardFrame(ctk.CTkFrame):
             getattr(self, "user_button", None),
             getattr(self, "audit_button", None),
             getattr(self, "backup_button", None),
-            getattr(self, "reliability_button", None),
+            getattr(self, "hr_operations_button", None),
         ]
 
         for button in buttons:

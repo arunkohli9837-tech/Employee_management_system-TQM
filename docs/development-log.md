@@ -918,3 +918,39 @@ The system now provides safer database transactions, rollback recovery, complete
 **Status:** Completed.
 
 ---
+
+## Commit 38 — Improve Backup and Audit Log Management
+**Date:** 19 September 2026
+
+- Improved backup management and audit log handling.
+- Focused on reliability of backup operations and traceability of important system activities.
+- Details above are summarized from the recorded commit title; avoid inferring unverified implementation specifics.
+
+## Commit 39 — Add FMEA Risk Analysis and Fix Backup Status
+**Date:** 19 September 2026
+
+- Added FMEA risk analysis for potential system failures.
+- Fixed backup status handling.
+- Details above are summarized from the recorded commit title; verify exact code-level changes against the commit diff if a detailed history is required.
+
+---
+## Commit 40 — Consolidate Employee Management Improvements
+**Date:** 25 October 2026
+
+### Objective
+Consolidate the latest Employee Management System improvements and update the project documentation.
+
+### Work Completed
+- Consolidated employee management, user management, and authentication updates.
+- Included Payroll & Performance features and supporting HR operations.
+- Improved audit logging, backup/restore, input validation, and error handling.
+- Updated project setup information and requirements.
+- Preserved and updated project documentation, diagrams, testing records, FMEA, and quality-improvement notes.
+- Removed the **Reliability** option from the dashboard sidebar while preserving the related implementation and tests.
+
+### Validation
+- Recorded the current project changes under Commit 40.
+- Live GUI behavior should be verified in the target environment.
+
+**Status:** Completed.
+---

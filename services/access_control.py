@@ -5,10 +5,12 @@ ROLE_PERMISSIONS = {
         "view_employees",
         "view_audit_logs",
         "manage_backups",
+        "manage_hr_operations",
     },
     "HR": {
         "manage_employees",
         "view_employees",
+        "manage_hr_operations",
     },
     "Employee": {
         "view_employees",
